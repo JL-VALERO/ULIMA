@@ -1,0 +1,1099 @@
+                                                                                                ___  ____  ____  ____  ____(R)
+                                                                                               /__    /   ____/   /   ____/   
+                                                                                              ___/   /   /___/   /   /___/    
+                                                                                                Statistics/Data analysis      
+      
+      ------------------------------------------------------------------------------------------------------------------------
+            name:  varlog
+             log:  C:\Users\51950\Documents\Claude_Jorge_PROYECTOS\Project_VAR\output/run_20260520/log_var.smcl
+        log type:  smcl
+       opened on:  20 May 2026, 18:55:42
+      
+     1 . 
+     2 . 
+     3 . /* ════════════════════════════════════════════════════════════
+      >    SECCIÓN 1  IMPORTAR + DIAGNÓSTICO DE DATOS
+      >    ════════════════════════════════════════════════════════════ */
+     4 . 
+     5 . di _newline(2) as result ///
+      >   "══════════════════════════════════════════" _n ///
+      >   "  SECCIÓN 1: IMPORTAR Y DIAGNOSTICAR"     _n ///
+      >   "══════════════════════════════════════════"
+      
+      
+      ══════════════════════════════════════════
+        SECCIÓN 1: IMPORTAR Y DIAGNOSTICAR
+      ══════════════════════════════════════════
+      
+     6 . 
+     7 . import excel using "$datafile", ///
+      >     sheet("$hoja") cellrange("$cellrange") firstrow clear
+      (5 vars, 264 obs)
+      
+     8 . 
+     9 . * ── Configurar serie de tiempo ───────────────────────────────
+    10 . if "$datemode" == "manual" {
+    11 .     gen __t = tm($startdate) + _n - 1
+    12 .     format __t %tm
+    13 .     tsset __t, monthly
+    14 .     keep if __t >= tm($inicio) & __t <= tm($fin)
+    15 . }
+      
+    16 . else {
+    17 .     gen __t = mofd($datevar)
+    18 .     format __t %tm
+    19 .     tsset __t, monthly
+      
+      Time variable: __t, 2004m1 to 2025m12
+              Delta: 1 month
+    20 .     keep if __t >= tm($inicio) & __t <= tm($fin)
+      (48 observations deleted)
+    21 . }
+      
+    22 . 
+    23 . qui count
+      
+    24 . local total_obs = r(N)
+      
+    25 . di as result "  Observaciones: `total_obs'  |  Período: $inicio – $fin"
+        Observaciones: 216  |  Período: 2004m1 – 2021m12
+      
+    26 . 
+    27 . * ── Diagnóstico de calidad de datos ─────────────────────────
+    28 . di _newline as text "── Diagnóstico de datos ──"
+      
+      ── Diagnóstico de datos ──
+      
+    29 . di as text "  Variable          Obs válidas  Missings  %Miss   Min         Max"
+        Variable          Obs válidas  Missings  %Miss   Min         Max
+      
+    30 . di as text "  ──────────────────────────────────────────────────────────────────"
+        ──────────────────────────────────────────────────────────────────
+      
+    31 . 
+    32 . local any_miss_alert = 0
+      
+    33 . 
+    34 . foreach v of global rawvars {
+        2.     cap confirm variable `v'
+        3.     if _rc != 0 {
+        4.         di as error "  ERROR: la variable '`v'' no existe en el Excel."
+        5.         di as error "  Variables disponibles:"
+        6.         describe, simple
+        7.         log close varlog
+        8.         exit 1
+        9.     }
+       10. 
+    35 .     qui count if missing(`v')
+       11.     local nmiss   = r(N)
+       12.     local nvalid  = `total_obs' - `nmiss'
+       13.     local pctmiss = round(`nmiss' / `total_obs' * 100, 0.1)
+       14.     qui sum `v'
+       15.     local vmin = r(min)
+       16.     local vmax = r(max)
+       17. 
+    36 .     if `pctmiss' > 20 {
+       18.         di as error "  " %-18s "`v'" %6.0f `nvalid' "      " %5.0f `nmiss' ///
+      >             "    " %5.1f `pctmiss' "%   " %10.3g `vmin' "  " %10.3g `vmax' ///
+      >             "  ← ALERTA >20%"
+       19.         local any_miss_alert = 1
+       20.     }
+       21.     else if `pctmiss' > 0 {
+       22.         di as text "  " %-18s "`v'" %6.0f `nvalid' "      " %5.0f `nmiss' ///
+      >             "    " %5.1f `pctmiss' "%   " %10.3g `vmin' "  " %10.3g `vmax' ///
+      >             "  ← missings"
+       23.     }
+       24.     else {
+       25.         di as result "  " %-18s "`v'" %6.0f `nvalid' "      " %5.0f `nmiss' ///
+      >             "    " %5.1f `pctmiss' "%   " %10.3g `vmin' "  " %10.3g `vmax'
+       26.     }
+       27. }
+        tasa_ref             216          0      0.0%          .25         6.5
+        tamn                 216          0      0.0%         10.5        26.3
+        ipc                  216          0      0.0%         85.3         144
+        tc                   216          0      0.0%         2.55        4.11
+      
+    37 . 
+    38 . if `any_miss_alert' {
+    39 .     di as error _n "  AVISO: variables con >20% missings → reportado a Claude."
+    40 . }
+      
+    41 . 
+    42 . qui tsreport
+      
+    43 . if r(N_gaps) > 0 {
+    44 .     di as error _n "  ALERTA: `=r(N_gaps)' gap(s) en la serie → reportado a Claude."
+    45 . }
+      
+    46 . else {
+    47 .     di as result _n "  Continuidad temporal: sin gaps ✓"
+      
+        Continuidad temporal: sin gaps ✓
+    48 . }
+      
+    49 . 
+    50 . di _newline as text "── Estadísticas descriptivas ──"
+      
+      ── Estadísticas descriptivas ──
+      
+    51 . summarize $rawvars
+      
+          Variable |        Obs        Mean    Std. dev.       Min        Max
+      -------------+---------------------------------------------------------
+          tasa_ref |        216    3.357639    1.424552        .25        6.5
+              tamn |        216    18.59397    4.205899    10.4913   26.27734
+               ipc |        216    111.2516    16.67076   85.27307   144.0194
+                tc |        216     3.14723      .32458   2.552564   4.108932
+      
+    52 . 
+    53 . 
+    54 . /* ════════════════════════════════════════════════════════════
+      >    SECCIÓN 2  RAÍCES UNITARIAS — NIVELES
+      >    ADF (4 lags, c+t)  +  PP (NW=8, c+t)
+      >    ════════════════════════════════════════════════════════════ */
+    55 . 
+    56 . di _newline(2) as result ///
+      >   "══════════════════════════════════════════"         _n ///
+      >   "  SECCIÓN 2: RAÍCES UNITARIAS (NIVELES)"           _n ///
+      >   "══════════════════════════════════════════"         _n ///
+      >   "  H0: raíz unitaria.  p < 0.05 → rechazar → I(0)" _n
+      
+      
+      ══════════════════════════════════════════
+        SECCIÓN 2: RAÍCES UNITARIAS (NIVELES)
+      ══════════════════════════════════════════
+        H0: raíz unitaria.  p < 0.05 → rechazar → I(0)
+      
+      
+    57 . 
+    58 . di as text "  Variable       ADF-t    ADF-p    PP-t     PP-p     Trans. config."
+        Variable       ADF-t    ADF-p    PP-t     PP-p     Trans. config.
+      
+    59 . di as text "  ─────────────  ──────   ──────   ──────   ──────   ─────────────"
+        ─────────────  ──────   ──────   ──────   ──────   ─────────────
+      
+    60 . 
+    61 . foreach v of global rawvars {
+        2.     qui dfuller `v', lags(4) trend
+        3.     local t_adf = r(Zt)
+        4.     local p_adf = r(p)
+        5.     qui pperron `v', lags(8) trend
+        6.     local t_pp  = r(Zt)
+        7.     local p_pp  = r(p)
+        8. 
+    62 .     di as text "  " %-14s "`v'" ///
+      >        %7.3f `t_adf' "  " %6.3f `p_adf' "  " ///
+      >        %7.3f `t_pp'  "  " %6.3f `p_pp'  "  " ///
+      >        "→ ${trans_`v'}"
+        9. }
+        tasa_ref       -3.713   0.022   -2.713   0.231  → level
+        tamn           -2.825   0.188   -3.108   0.104  → level
+        ipc            -2.353   0.405   -1.775   0.717  → pct
+        tc             -1.121   0.926   -0.696   0.973  → level
+      
+    63 . 
+    64 . 
+    65 . /* ════════════════════════════════════════════════════════════
+      >    SECCIÓN 3  APLICAR TRANSFORMACIONES
+      >    ════════════════════════════════════════════════════════════ */
+    66 . 
+    67 . di _newline(2) as result ///
+      >   "══════════════════════════════════════════" _n ///
+      >   "  SECCIÓN 3: TRANSFORMACIONES"            _n ///
+      >   "══════════════════════════════════════════"
+      
+      
+      ══════════════════════════════════════════
+        SECCIÓN 3: TRANSFORMACIONES
+      ══════════════════════════════════════════
+      
+    68 . 
+    69 . global finalvars ""
+      
+    70 . 
+    71 . foreach v of global rawvars {
+        2.     local tr "${trans_`v'}"
+        3. 
+    72 .     if "`tr'" == "level" {
+        4.         global finalvars "$finalvars `v'"
+        5.         global fname_`v' "`v'"
+        6.         di as text "  `v'  →  nivel  [`v']"
+        7.     }
+        8.     else if "`tr'" == "log" {
+        9.         cap drop l_`v'
+       10.         gen l_`v' = log(`v')
+       11.         label var l_`v' "log(`v')"
+       12.         global finalvars "$finalvars l_`v'"
+       13.         global fname_`v' "l_`v'"
+       14.         di as text "  `v'  →  log(`v')  [l_`v']"
+       15.     }
+       16.     else if "`tr'" == "diff" {
+       17.         cap drop d_`v'
+       18.         gen d_`v' = D.`v'
+       19.         label var d_`v' "D.`v'"
+       20.         global finalvars "$finalvars d_`v'"
+       21.         global fname_`v' "d_`v'"
+       22.         di as text "  `v'  →  D.`v'  [d_`v']"
+       23.     }
+       24.     else if "`tr'" == "diff3" {
+       25.         cap drop d3_`v'
+       26.         gen d3_`v' = `v' - L3.`v'
+       27.         label var d3_`v' "D3.`v' (var. trim.)"
+       28.         global finalvars "$finalvars d3_`v'"
+       29.         global fname_`v' "d3_`v'"
+       30.         di as text "  `v'  →  `v' - L3.`v'  [d3_`v']"
+       31.     }
+       32.     else if "`tr'" == "logdiff" {
+       33.         cap drop dl_`v'
+       34.         gen dl_`v' = D.log(`v')
+       35.         label var dl_`v' "D.log(`v')"
+       36.         global finalvars "$finalvars dl_`v'"
+       37.         global fname_`v' "dl_`v'"
+       38.         di as text "  `v'  →  D.log(`v')  [dl_`v']"
+       39.     }
+       40.     else if "`tr'" == "pct" {
+       41.         cap drop pct_`v'
+       42.         gen pct_`v' = (`v' / L.`v' - 1) * 100
+       43.         label var pct_`v' "Var.% `v'"
+       44.         global finalvars "$finalvars pct_`v'"
+       45.         global fname_`v' "pct_`v'"
+       46.         di as text "  `v'  →  var.% mensual  [pct_`v']"
+       47.     }
+       48.     else if "`tr'" == "pct3" {
+       49.         cap drop pct3_`v'
+       50.         gen pct3_`v' = (`v' / L3.`v' - 1) * 100
+       51.         label var pct3_`v' "Var.% trim. `v'"
+       52.         global finalvars "$finalvars pct3_`v'"
+       53.         global fname_`v' "pct3_`v'"
+       54.         di as text "  `v'  →  (`v'/L3.`v'-1)*100  [pct3_`v']"
+       55.     }
+       56.     else {
+       57.         di as error "  ERROR: transformación '`tr'' desconocida para `v'."
+       58.         di as error "  Opciones: level | log | diff | diff3 | logdiff | pct | pct3"
+       59.         log close varlog
+       60.         exit 1
+       61.     }
+       62. }
+        tasa_ref  →  nivel  [tasa_ref]
+        tamn  →  nivel  [tamn]
+      (1 missing value generated)
+        ipc  →  var.% mensual  [pct_ipc]
+        tc  →  nivel  [tc]
+      
+    73 . 
+    74 . di as result _n "  Variables finales: $finalvars"
+      
+        Variables finales:  tasa_ref tamn pct_ipc tc
+      
+    75 . 
+    76 . 
+    77 . /* ════════════════════════════════════════════════════════════
+      >    SECCIÓN 4  CONFIRMAR I(0) — VARIABLES TRANSFORMADAS
+      >    ════════════════════════════════════════════════════════════ */
+    78 . 
+    79 . di _newline(2) as result ///
+      >   "══════════════════════════════════════════════════════" _n ///
+      >   "  SECCIÓN 4: CONFIRMAR I(0) — VARS. TRANSFORMADAS"   _n ///
+      >   "══════════════════════════════════════════════════════"
+      
+      
+      ══════════════════════════════════════════════════════
+        SECCIÓN 4: CONFIRMAR I(0) — VARS. TRANSFORMADAS
+      ══════════════════════════════════════════════════════
+      
+    80 . 
+    81 . local still_nonstat = 0
+      
+    82 . foreach v of global finalvars {
+        2.     qui pperron `v', lags(8) trend
+        3.     local pv = r(p)
+        4.     if `pv' < 0.05 {
+        5.         di as result "  %-24s p = " %5.3f `pv' "  I(0) ✓"
+        6.     }
+        7.     else {
+        8.         di as error  "  %-24s p = " %5.3f `pv' "  ALERTA: sigue no-estacionaria"
+        9.         local still_nonstat = 1
+       10.     }
+       11. }
+        %-24s p = 0.231  ALERTA: sigue no-estacionaria
+        %-24s p = 0.104  ALERTA: sigue no-estacionaria
+        %-24s p = 0.000  I(0) ✓
+        %-24s p = 0.973  ALERTA: sigue no-estacionaria
+      
+    83 . 
+    84 . if `still_nonstat' {
+    85 .     di as error _n "  AVISO: variable(s) no-estacionarias → reportado a Claude."
+      
+        AVISO: variable(s) no-estacionarias → reportado a Claude.
+    86 . }
+      
+    87 . 
+    88 . 
+    89 . /* ════════════════════════════════════════════════════════════
+      >    SECCIÓN 5  SELECCIÓN DE REZAGOS (varsoc)
+      >    p_use configurado en Sección 0. varsoc corre para registro.
+      >    ════════════════════════════════════════════════════════════ */
+    90 . 
+    91 . di _newline(2) as result ///
+      >   "══════════════════════════════════════════" _n ///
+      >   "  SECCIÓN 5: SELECCIÓN DE REZAGOS"        _n ///
+      >   "══════════════════════════════════════════"
+      
+      
+      ══════════════════════════════════════════
+        SECCIÓN 5: SELECCIÓN DE REZAGOS
+      ══════════════════════════════════════════
+      
+    92 . 
+    93 . if "$exogenas" != "" {
+    94 .     varsoc $finalvars, maxlag($p_max) exog($exogenas)
+    95 . }
+      
+    96 . else {
+    97 .     varsoc $finalvars, maxlag($p_max)
+      
+      Lag-order selection criteria
+      
+         Sample: 2004m8 thru 2021m12                             Number of obs = 209
+        +---------------------------------------------------------------------------+
+        | Lag |    LL      LR      df    p     FPE       AIC      HQIC      SBIC    |
+        |-----+---------------------------------------------------------------------|
+        |   0 | -991.914                     .161826   9.53027   9.55614   9.59424  |
+        |   1 |  333.185  2650.2   16  0.000 5.9e-07  -2.99699  -2.86767  -2.67714  |
+        |   2 |  421.284   176.2   16  0.000 2.9e-07* -3.68692* -3.45416* -3.11121* |
+        |   3 |   433.55  24.532   16  0.079 3.1e-07  -3.65119  -3.31498  -2.81961  |
+        |   4 |  447.252  27.405*  16  0.037 3.1e-07   -3.6292  -3.18954  -2.54175  |
+        |   5 |  455.566  16.629   16  0.410 3.4e-07  -3.55566  -3.01254  -2.21233  |
+        |   6 |  463.637  16.142   16  0.443 3.6e-07  -3.47978  -2.83322  -1.88058  |
+        +---------------------------------------------------------------------------+
+         * optimal lag
+         Endogenous: tasa_ref tamn pct_ipc tc
+          Exogenous: _cons
+    98 . }
+      
+    99 . 
+   100 . di as result _n "  Rezagos en estimación: p = $p_use  (configurado en Sección 0)"
+      
+        Rezagos en estimación: p = 2  (configurado en Sección 0)
+      
+   101 . 
+   102 . 
+   103 . /* ════════════════════════════════════════════════════════════
+      >    SECCIÓN 6  ESTIMAR VAR + IRF CREATE
+      >    ════════════════════════════════════════════════════════════ */
+   104 . 
+   105 . di _newline(2) as result ///
+      >   "══════════════════════════════════════════" _n ///
+      >   "  SECCIÓN 6: ESTIMANDO VAR($p_use)"       _n ///
+      >   "══════════════════════════════════════════"
+      
+      
+      ══════════════════════════════════════════
+        SECCIÓN 6: ESTIMANDO VAR(2)
+      ══════════════════════════════════════════
+      
+   106 . di as text "  Endógenas : $chol_order"
+        Endógenas : tasa_ref tc tamn pct_ipc
+      
+   107 . di as text "  Exógenas  : $exogenas"
+        Exógenas  : 
+      
+   108 . di as text "  Cholesky  : identificación recursiva"
+        Cholesky  : identificación recursiva
+      
+   109 . 
+   110 . if "$exogenas" != "" {
+   111 .     var $chol_order, lags(1/$p_use) exog($exogenas)
+   112 . }
+      
+   113 . else {
+   114 .     var $chol_order, lags(1/$p_use)
+      
+      Vector autoregression
+      
+      Sample: 2004m4 thru 2021m12                     Number of obs     =        213
+      Log likelihood =   430.5541                     AIC               =  -3.704734
+      FPE            =   2.89e-07                     HQIC              =  -3.475143
+      Det(Sigma_ml)  =   2.06e-07                     SBIC              =  -3.136628
+      
+      Equation           Parms      RMSE     R-sq      chi2     P>chi2
+      ----------------------------------------------------------------
+      tasa_ref              9     .158349   0.9882   17862.11   0.0000
+      tc                    9     .038509   0.9865   15508.68   0.0000
+      tamn                  9     .293966   0.9952   44618.53   0.0000
+      pct_ipc               9     .281247   0.1156    27.8307   0.0005
+      ----------------------------------------------------------------
+      
+      ------------------------------------------------------------------------------
+                   | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+      -------------+----------------------------------------------------------------
+      tasa_ref     |
+          tasa_ref |
+               L1. |   1.633996   .0522358    31.28   0.000     1.531615    1.736376
+               L2. |  -.6701704   .0517141   -12.96   0.000    -.7715281   -.5688126
+                   |
+                tc |
+               L1. |  -.0316146   .2717283    -0.12   0.907    -.5641923    .5009632
+               L2. |  -.0035962   .2738285    -0.01   0.990    -.5402903    .5330978
+                   |
+              tamn |
+               L1. |   -.013365   .0356839    -0.37   0.708    -.0833043    .0565742
+               L2. |   .0186046   .0357216     0.52   0.602    -.0514085    .0886177
+                   |
+           pct_ipc |
+               L1. |    .085581   .0386351     2.22   0.027     .0098577    .1613044
+               L2. |   .0841605    .038358     2.19   0.028     .0089801    .1593409
+                   |
+             _cons |   .0948138   .1467734     0.65   0.518    -.1928567    .3824843
+      -------------+----------------------------------------------------------------
+      tc           |
+          tasa_ref |
+               L1. |   .0173784   .0127031     1.37   0.171    -.0075193    .0422761
+               L2. |  -.0191237   .0125763    -1.52   0.128    -.0437728    .0055253
+                   |
+                tc |
+               L1. |   1.255136   .0660812    18.99   0.000     1.125619    1.384653
+               L2. |  -.2646728   .0665919    -3.97   0.000    -.3951906   -.1341551
+                   |
+              tamn |
+               L1. |  -.0062772   .0086779    -0.72   0.469    -.0232857    .0107312
+               L2. |   .0045842   .0086871     0.53   0.598    -.0124422    .0216106
+                   |
+           pct_ipc |
+               L1. |  -.0208233   .0093956    -2.22   0.027    -.0392384   -.0024083
+               L2. |   .0170867   .0093282     1.83   0.067    -.0011963    .0353697
+                   |
+             _cons |    .069894   .0356936     1.96   0.050    -.0000642    .1398521
+      -------------+----------------------------------------------------------------
+      tamn         |
+          tasa_ref |
+               L1. |   .3844728   .0969729     3.96   0.000     .1944094    .5745361
+               L2. |  -.3695149   .0960043    -3.85   0.000    -.5576799   -.1813499
+                   |
+                tc |
+               L1. |  -.4888458   .5044485    -0.97   0.333    -1.477547    .4998551
+               L2. |   .4976937   .5083474     0.98   0.328    -.4986488    1.494036
+                   |
+              tamn |
+               L1. |   1.155626   .0662452    17.44   0.000     1.025788    1.285464
+               L2. |  -.1612654   .0663152    -2.43   0.015    -.2912408   -.0312899
+                   |
+           pct_ipc |
+               L1. |   .0946171   .0717239     1.32   0.187    -.0459591    .2351933
+               L2. |  -.1764842   .0712096    -2.48   0.013    -.3160524   -.0369161
+                   |
+             _cons |  -.0046414   .2724765    -0.02   0.986    -.5386856    .5294028
+      -------------+----------------------------------------------------------------
+      pct_ipc      |
+          tasa_ref |
+               L1. |   .2392806   .0927771     2.58   0.010     .0574408    .4211205
+               L2. |  -.2236263   .0918505    -2.43   0.015    -.4036499   -.0436027
+                   |
+                tc |
+               L1. |   .9364198   .4826224     1.94   0.052    -.0095028    1.882342
+               L2. |  -.9377151   .4863526    -1.93   0.054    -1.890949    .0155185
+                   |
+              tamn |
+               L1. |   .0400721    .063379     0.63   0.527    -.0841484    .1642927
+               L2. |  -.0471966   .0634459    -0.74   0.457    -.1715484    .0771551
+                   |
+           pct_ipc |
+               L1. |   .1562523   .0686206     2.28   0.023     .0217584    .2907461
+               L2. |    .015718   .0681285     0.23   0.818    -.1178114    .1492475
+                   |
+             _cons |   .2833609   .2606873     1.09   0.277    -.2275767    .7942985
+      ------------------------------------------------------------------------------
+   115 . }
+      
+   116 . 
+   117 . estimates store var_main
+      
+   118 . 
+   119 . local nobs   = e(N)
+      
+   120 . local neq    = e(k_eq)
+      
+   121 . local nparam = `neq' * `neq' * $p_use
+      
+   122 . di as result _n "  Obs: `nobs'  |  Ecuaciones: `neq'  |  Parámetros: `nparam'"
+      
+        Obs: 213  |  Ecuaciones: 4  |  Parámetros: 32
+      
+   123 . 
+   124 . if `nparam' > `nobs' / 5 {
+   125 .     di as error "  AVISO: muchos parámetros para el tamaño muestral (T/k²p < 5)."
+   126 . }
+      
+   127 . 
+   128 . irf create irf_main, step($irf_step) set(`"$outdir/irf_main"') replace
+      (file output/run_20260520/irf_main.irf created)
+      (file output/run_20260520/irf_main.irf now active)
+      irfname irf_main not found in output/run_20260520/irf_main.irf
+      (file output/run_20260520/irf_main.irf updated)
+      
+   129 . 
+   130 . 
+   131 . /* ════════════════════════════════════════════════════════════
+      >    SECCIÓN 7  DIAGNÓSTICOS COMPLETOS
+      >    ════════════════════════════════════════════════════════════ */
+   132 . 
+   133 . di _newline(2) as result ///
+      >   "══════════════════════════════════════════" _n ///
+      >   "  SECCIÓN 7: DIAGNÓSTICOS"                _n ///
+      >   "══════════════════════════════════════════"
+      
+      
+      ══════════════════════════════════════════
+        SECCIÓN 7: DIAGNÓSTICOS
+      ══════════════════════════════════════════
+      
+   134 . 
+   135 . * 7a. Estabilidad
+   136 . di _newline as result "── 7a. Estabilidad (raíces características) ──"
+      
+      ── 7a. Estabilidad (raíces características) ──
+      
+   137 . varstable, graph dlabel
+      
+         Eigenvalue stability condition
+        +----------------------------------------+
+        |        Eigenvalue        |   Modulus   |
+        |--------------------------+-------------|
+        |   .9972539               |   .997254   |
+        |   .9913867               |   .991387   |
+        |   .8568518 + .09721785i  |   .862349   |
+        |   .8568518 - .09721785i  |   .862349   |
+        |   .3100836               |   .310084   |
+        |   .1109941 +   .223654i  |   .249681   |
+        |   .1109941 -   .223654i  |   .249681   |
+        |  -.0334058               |   .033406   |
+        +----------------------------------------+
+         All the eigenvalues lie inside the unit circle.
+         VAR satisfies stability condition.
+      
+   138 . graph export `"$outdir/diag_estabilidad.png"', replace width(700) height(650)
+      (file output/run_20260520/diag_estabilidad.png not found)
+      file output/run_20260520/diag_estabilidad.png saved as PNG format
+      
+   139 . di as text "  → diag_estabilidad.png"
+        → diag_estabilidad.png
+      
+   140 . 
+   141 . * 7b. Autocorrelación LM
+   142 . di _newline as result "── 7b. Test LM de autocorrelación ──"
+      
+      ── 7b. Test LM de autocorrelación ──
+      
+   143 . di as text "  H0: sin autocorrelación serial. Deseable: p > 0.05."
+        H0: sin autocorrelación serial. Deseable: p > 0.05.
+      
+   144 . varlmar, mlag(12)
+      
+         Lagrange-multiplier test
+        +--------------------------------------+
+        | lag  |      chi2    df   Prob > chi2 |
+        |------+-------------------------------|
+        |   1  |   20.7333    16     0.18899   |
+        |   2  |   19.0907    16     0.26399   |
+        |   3  |   24.4835    16     0.07946   |
+        |   4  |   17.2586    16     0.36906   |
+        |   5  |   11.6096    16     0.77039   |
+        |   6  |   14.7136    16     0.54571   |
+        |   7  |   11.2003    16     0.79696   |
+        |   8  |   19.3690    16     0.24999   |
+        |   9  |   13.3055    16     0.65030   |
+        |  10  |   20.5560    16     0.19622   |
+        |  11  |   17.7185    16     0.34064   |
+        |  12  |   23.7007    16     0.09625   |
+        +--------------------------------------+
+         H0: no autocorrelation at lag order
+      
+   145 . 
+   146 . * 7c. Normalidad (informativa)
+   147 . di _newline as result "── 7c. Normalidad Jarque-Bera (informativa) ──"
+      
+      ── 7c. Normalidad Jarque-Bera (informativa) ──
+      
+   148 . varnorm, jbera
+      
+         Jarque-Bera test
+        +--------------------------------------------------------+
+        |           Equation |            chi2   df  Prob > chi2 |
+        |--------------------+-----------------------------------|
+        |           tasa_ref |          925.770   2    0.00000   |
+        |                 tc |           31.901   2    0.00000   |
+        |               tamn |           37.287   2    0.00000   |
+        |            pct_ipc |           20.751   2    0.00003   |
+        |                ALL |          1015.709  8    0.00000   |
+        +--------------------------------------------------------+
+      
+   149 . 
+   150 . * 7d. Significancia de rezagos
+   151 . di _newline as result "── 7d. Significancia de rezagos — Wald test ──"
+      
+      ── 7d. Significancia de rezagos — Wald test ──
+      
+   152 . varwle
+      
+         Equation: tasa_ref
+        +------------------------------------+
+        | lag |    chi2      df  Prob > chi2 |
+        |-----+------------------------------|
+        |   1 |  1102.456     4     0.000    |
+        |   2 |  198.2568     4     0.000    |
+        +------------------------------------+
+      
+         Equation: tc
+        +------------------------------------+
+        | lag |    chi2      df  Prob > chi2 |
+        |-----+------------------------------|
+        |   1 |  369.6465     4     0.000    |
+        |   2 |  21.86614     4     0.000    |
+        +------------------------------------+
+      
+         Equation: tamn
+        +------------------------------------+
+        | lag |    chi2      df  Prob > chi2 |
+        |-----+------------------------------|
+        |   1 |  382.9119     4     0.000    |
+        |   2 |  28.50734     4     0.000    |
+        +------------------------------------+
+      
+         Equation: pct_ipc
+        +------------------------------------+
+        | lag |    chi2      df  Prob > chi2 |
+        |-----+------------------------------|
+        |   1 |  22.56059     4     0.000    |
+        |   2 |    12.456     4     0.014    |
+        +------------------------------------+
+      
+         Equation: All
+        +------------------------------------+
+        | lag |    chi2      df  Prob > chi2 |
+        |-----+------------------------------|
+        |   1 |  1811.671    16     0.000    |
+        |   2 |  244.5249    16     0.000    |
+        +------------------------------------+
+      
+   153 . 
+   154 . * 7e. Causalidad de Granger
+   155 . di _newline as result "── 7e. Causalidad de Granger ──"
+      
+      ── 7e. Causalidad de Granger ──
+      
+   156 . vargranger
+      
+         Granger causality Wald tests
+        +------------------------------------------------------------------+
+        |          Equation           Excluded |   chi2     df Prob > chi2 |
+        |--------------------------------------+---------------------------|
+        |          tasa_ref                 tc |  .82798     2    0.661    |
+        |          tasa_ref               tamn |  3.0094     2    0.222    |
+        |          tasa_ref            pct_ipc |  11.899     2    0.003    |
+        |          tasa_ref                ALL |  13.975     6    0.030    |
+        |--------------------------------------+---------------------------|
+        |                tc           tasa_ref |  2.7563     2    0.252    |
+        |                tc               tamn |  5.4165     2    0.067    |
+        |                tc            pct_ipc |   7.016     2    0.030    |
+        |                tc                ALL |  17.925     6    0.006    |
+        |--------------------------------------+---------------------------|
+        |              tamn           tasa_ref |  15.776     2    0.000    |
+        |              tamn                 tc |  .95852     2    0.619    |
+        |              tamn            pct_ipc |  6.9174     2    0.031    |
+        |              tamn                ALL |  21.489     6    0.001    |
+        |--------------------------------------+---------------------------|
+        |           pct_ipc           tasa_ref |  6.9246     2    0.031    |
+        |           pct_ipc                 tc |  3.7674     2    0.152    |
+        |           pct_ipc               tamn |  2.1098     2    0.348    |
+        |           pct_ipc                ALL |  14.762     6    0.022    |
+        +------------------------------------------------------------------+
+      
+   157 . 
+   158 . 
+   159 . /* ════════════════════════════════════════════════════════════
+      >    SECCIÓN 8  IRF — ORTOGONALIZADAS (todos los pares)
+      >    ════════════════════════════════════════════════════════════ */
+   160 . 
+   161 . di _newline(2) as result ///
+      >   "══════════════════════════════════════════" _n ///
+      >   "  SECCIÓN 8: IMPULSO-RESPUESTA (OIRF)"    _n ///
+      >   "══════════════════════════════════════════"
+      
+      
+      ══════════════════════════════════════════
+        SECCIÓN 8: IMPULSO-RESPUESTA (OIRF)
+      ══════════════════════════════════════════
+      
+   162 . 
+   163 . local vars_list "$chol_order"
+      
+   164 . 
+   165 . foreach imp of local vars_list {
+        2.     foreach resp of local vars_list {
+        3. 
+   166 .         irf graph oirf,                                                              ///
+      >             impulse(`imp') response(`resp') irf(irf_main)                            ///
+      >             level($irf_ic)                                                           ///
+      >             yline(0, lpattern(dash) lcolor(gs8) lwidth(thin))                       ///
+      >             xlabel(0(4)$irf_step) xtitle("Períodos") ytitle("OIRF")                ///
+      >             title("Shock `imp' → `resp'", size(medsmall) color(navy))               ///
+      >             note("Cholesky. IC $irf_ic%. p=$p_use. $inicio–$fin", size(vsmall))    ///
+      >             name(g_irf, replace)
+        4. 
+   167 .         graph export `"$outdir/irf_`imp'_`resp'.png"',                              ///
+      >             replace width(900) height(580)
+        5.         di as text "  → irf_`imp'_`resp'.png"
+        6.     }
+        7. }
+      (file output/run_20260520/irf_tasa_ref_tasa_ref.png not found)
+      file output/run_20260520/irf_tasa_ref_tasa_ref.png saved as PNG format
+        → irf_tasa_ref_tasa_ref.png
+      (file output/run_20260520/irf_tasa_ref_tc.png not found)
+      file output/run_20260520/irf_tasa_ref_tc.png saved as PNG format
+        → irf_tasa_ref_tc.png
+      (file output/run_20260520/irf_tasa_ref_tamn.png not found)
+      file output/run_20260520/irf_tasa_ref_tamn.png saved as PNG format
+        → irf_tasa_ref_tamn.png
+      (file output/run_20260520/irf_tasa_ref_pct_ipc.png not found)
+      file output/run_20260520/irf_tasa_ref_pct_ipc.png saved as PNG format
+        → irf_tasa_ref_pct_ipc.png
+      (file output/run_20260520/irf_tc_tasa_ref.png not found)
+      file output/run_20260520/irf_tc_tasa_ref.png saved as PNG format
+        → irf_tc_tasa_ref.png
+      (file output/run_20260520/irf_tc_tc.png not found)
+      file output/run_20260520/irf_tc_tc.png saved as PNG format
+        → irf_tc_tc.png
+      (file output/run_20260520/irf_tc_tamn.png not found)
+      file output/run_20260520/irf_tc_tamn.png saved as PNG format
+        → irf_tc_tamn.png
+      (file output/run_20260520/irf_tc_pct_ipc.png not found)
+      file output/run_20260520/irf_tc_pct_ipc.png saved as PNG format
+        → irf_tc_pct_ipc.png
+      (file output/run_20260520/irf_tamn_tasa_ref.png not found)
+      file output/run_20260520/irf_tamn_tasa_ref.png saved as PNG format
+        → irf_tamn_tasa_ref.png
+      (file output/run_20260520/irf_tamn_tc.png not found)
+      file output/run_20260520/irf_tamn_tc.png saved as PNG format
+        → irf_tamn_tc.png
+      (file output/run_20260520/irf_tamn_tamn.png not found)
+      file output/run_20260520/irf_tamn_tamn.png saved as PNG format
+        → irf_tamn_tamn.png
+      (file output/run_20260520/irf_tamn_pct_ipc.png not found)
+      file output/run_20260520/irf_tamn_pct_ipc.png saved as PNG format
+        → irf_tamn_pct_ipc.png
+      (file output/run_20260520/irf_pct_ipc_tasa_ref.png not found)
+      file output/run_20260520/irf_pct_ipc_tasa_ref.png saved as PNG format
+        → irf_pct_ipc_tasa_ref.png
+      (file output/run_20260520/irf_pct_ipc_tc.png not found)
+      file output/run_20260520/irf_pct_ipc_tc.png saved as PNG format
+        → irf_pct_ipc_tc.png
+      (file output/run_20260520/irf_pct_ipc_tamn.png not found)
+      file output/run_20260520/irf_pct_ipc_tamn.png saved as PNG format
+        → irf_pct_ipc_tamn.png
+      (file output/run_20260520/irf_pct_ipc_pct_ipc.png not found)
+      file output/run_20260520/irf_pct_ipc_pct_ipc.png saved as PNG format
+        → irf_pct_ipc_pct_ipc.png
+      
+   168 . 
+   169 . 
+   170 . /* ════════════════════════════════════════════════════════════
+      >    SECCIÓN 9  FEVD — DESCOMPOSICIÓN DE VARIANZA
+      >    ════════════════════════════════════════════════════════════ */
+   171 . 
+   172 . di _newline(2) as result ///
+      >   "══════════════════════════════════════════" _n ///
+      >   "  SECCIÓN 9: DESCOMPOSICIÓN DE VARIANZA"  _n ///
+      >   "══════════════════════════════════════════"
+      
+      
+      ══════════════════════════════════════════
+        SECCIÓN 9: DESCOMPOSICIÓN DE VARIANZA
+      ══════════════════════════════════════════
+      
+   173 . 
+   174 . irf table fevd, irf(irf_main) ///
+      >     impulse($chol_order) response($chol_order) noci
+      
+      Results from irf_main
+      
+      ------------------------------------------------------------------------------------------------------------------------
+               |      (1)         (2)         (3)         (4)         (5)         (6)         (7)         (8)         (9)     
+      >     (10)                                                                                                              
+      >          
+          Step |     fevd        fevd        fevd        fevd        fevd        fevd        fevd        fevd        fevd     
+      >    fevd                                                                                                               
+      >          
+      ---------+--------------------------------------------------------------------------------------------------------------
+             0 |        0           0           0           0           0           0           0           0           0     
+      >       0
+             1 |        1     .000072     .019649     .008581           0     .999928     .000024      .00754           0     
+      >       0
+             2 |  .993712     .000651     .066026     .030196     8.5e-06     .989674     .001561     .025794     .000183     
+      > .000819
+             3 |   .97537      .00143     .112903     .046556     .000152     .989323     .002707      .02779     .000211     
+      > .002277
+             4 |  .957564     .001966     .152135     .055142     .000457     .989355     .003707     .027798     .000148     
+      >  .00356
+             5 |  .943345     .002142     .182998     .059147     .000736     .989115     .004226     .027714     .000102     
+      > .004759
+             6 |  .932321     .002006     .206668     .060798     .000897     .988739      .00442      .02766     .000096     
+      >  .00599
+             7 |  .923733     .001732     .224453     .061318      .00094     .988195     .004477      .02763     .000141     
+      > .007298
+             8 |  .916975     .001545     .237475      .06139       .0009      .98733     .004498     .027621      .00024     
+      > .008705
+             9 |  .911596     .001662     .246668     .061382     .000821     .985959     .004528     .027629     .000401     
+      > .010218
+            10 |  .907259     .002257     .252808     .061464     .000745     .983916     .004585     .027651     .000628     
+      > .011845
+            11 |  .903702     .003445     .256529     .061689     .000711     .981086     .004676     .027683     .000927     
+      > .013589
+            12 |   .90072     .005286     .258353     .062046     .000754     .977407     .004801     .027721     .001303     
+      > .015452
+            13 |   .89815     .007783     .258702     .062498     .000901     .972875     .004958     .027762     .001759     
+      > .017435
+            14 |  .895861       .0109      .25792        .063     .001174      .96753     .005144     .027804     .002299     
+      > .019539
+            15 |   .89375      .01457     .256284     .063513     .001587     .961447     .005355     .027846     .002922     
+      > .021762
+            16 |  .891734     .018704     .254017     .064005     .002149     .954722     .005585     .027886     .003628     
+      > .024104
+            17 |  .889752     .023209     .251298     .064455     .002861     .947461     .005831     .027923     .004416     
+      > .026563
+            18 |  .887755     .027987     .248269     .064851     .003718     .939773     .006087     .027958     .005282     
+      > .029138
+            19 |  .885714     .032947     .245042     .065188     .004711     .931763     .006351     .027989     .006222     
+      > .031827
+            20 |  .883608     .038005     .241705     .065468     .005827     .923525     .006617     .028017     .007231     
+      > .034629
+            21 |  .881428     .043089     .238327     .065694     .007049     .915143     .006883     .028043     .008304     
+      > .037542
+            22 |   .87917     .048139     .234959     .065872     .008361     .906688     .007147     .028065     .009436     
+      > .040563
+            23 |  .876839     .053106      .23164     .066011     .009745     .898216     .007405     .028085     .010622     
+      >  .04369
+            24 |   .87444     .057951     .228399     .066116     .011185     .889775     .007656     .028103     .011858     
+      >  .04692
+      ------------------------------------------------------------------------------------------------------------------------
+      
+      ----------------------------------------------------------------------------
+               |      (11)        (12)        (13)        (14)        (15)        (16) 
+          Step |     fevd        fevd        fevd        fevd        fevd        fevd  
+      ---------+------------------------------------------------------------------
+             0 |        0           0           0           0           0           0
+             1 |  .980328     .000106           0           0           0     .983773
+             2 |  .929139     .001585     .006096     .008856     .003275     .942425
+             3 |  .882418     .001568     .024268     .006971     .001971     .924086
+             4 |  .842776     .001725     .041831     .005119     .001382     .915334
+             5 |  .811463      .00185     .055817     .003984     .001313     .911289
+             6 |  .787261     .001944     .066685     .003266     .001652     .909598
+             7 |  .768903     .002024     .075186     .002775     .002168     .909029
+             8 |  .755319     .002096     .081885      .00242     .002709     .908894
+             9 |  .745612     .002162     .087182     .002161     .003192     .908826
+            10 |  .739027     .002225     .091368     .001982      .00358      .90866
+            11 |  .734932     .002285      .09466      .00188     .003863     .908344
+            12 |  .732802     .002343     .097224     .001855     .004044      .90789
+            13 |  .732201     .002401     .099191     .001907     .004139     .907339
+            14 |  .732774     .002459     .100667     .002031     .004161     .906737
+            15 |  .734232     .002517     .101741     .002221     .004129     .906124
+            16 |  .736342     .002576     .102488      .00247     .004057     .905533
+            17 |  .738915     .002637     .102971     .002767     .003956     .904985
+            18 |  .741805     .002699     .103244     .003102     .003839     .904493
+            19 |  .744896     .002762     .103353     .003463     .003711     .904061
+            20 |  .748097     .002826     .103334     .003841     .003581     .903689
+            21 |  .751339     .002891     .103219     .004226     .003451     .903373
+            22 |   .75457     .002956     .103032     .004611     .003324     .903106
+            23 |  .757752     .003022     .102793     .004988     .003203     .902881
+            24 |  .760856     .003089     .102517     .005354     .003088     .902692
+      ----------------------------------------------------------------------------
+      (1) irfname = irf_main, impulse = tasa_ref, and response = tasa_ref.
+      (2) irfname = irf_main, impulse = tasa_ref, and response = tc.
+      (3) irfname = irf_main, impulse = tasa_ref, and response = tamn.
+      (4) irfname = irf_main, impulse = tasa_ref, and response = pct_ipc.
+      (5) irfname = irf_main, impulse = tc, and response = tasa_ref.
+      (6) irfname = irf_main, impulse = tc, and response = tc.
+      (7) irfname = irf_main, impulse = tc, and response = tamn.
+      (8) irfname = irf_main, impulse = tc, and response = pct_ipc.
+      (9) irfname = irf_main, impulse = tamn, and response = tasa_ref.
+      (10) irfname = irf_main, impulse = tamn, and response = tc.
+      (11) irfname = irf_main, impulse = tamn, and response = tamn.
+      (12) irfname = irf_main, impulse = tamn, and response = pct_ipc.
+      (13) irfname = irf_main, impulse = pct_ipc, and response = tasa_ref.
+      (14) irfname = irf_main, impulse = pct_ipc, and response = tc.
+      (15) irfname = irf_main, impulse = pct_ipc, and response = tamn.
+      (16) irfname = irf_main, impulse = pct_ipc, and response = pct_ipc.
+      
+   175 . 
+   176 . foreach resp of local vars_list {
+        2.     irf graph fevd,                                                               ///
+      >         response(`resp') irf(irf_main)                                            ///
+      >         title("FEVD: `resp'", size(medsmall) color(maroon))                      ///
+      >         note("Cholesky. p=$p_use. $inicio–$fin", size(vsmall))                   ///
+      >         name(g_fevd, replace)
+        3.     graph export `"$outdir/fevd_`resp'.png"',                                    ///
+      >         replace width(900) height(580)
+        4.     di as text "  → fevd_`resp'.png"
+        5. }
+      (file output/run_20260520/fevd_tasa_ref.png not found)
+      file output/run_20260520/fevd_tasa_ref.png saved as PNG format
+        → fevd_tasa_ref.png
+      (file output/run_20260520/fevd_tc.png not found)
+      file output/run_20260520/fevd_tc.png saved as PNG format
+        → fevd_tc.png
+      (file output/run_20260520/fevd_tamn.png not found)
+      file output/run_20260520/fevd_tamn.png saved as PNG format
+        → fevd_tamn.png
+      (file output/run_20260520/fevd_pct_ipc.png not found)
+      file output/run_20260520/fevd_pct_ipc.png saved as PNG format
+        → fevd_pct_ipc.png
+      
+   177 . 
+   178 . 
+   179 . /* ════════════════════════════════════════════════════════════
+      >    SECCIÓN 10  GENERAR var_simple.do
+      >    Estilo codigos.do: lineal, sin automatización, ~40 líneas.
+      >    ════════════════════════════════════════════════════════════ */
+   180 . 
+   181 . di _newline(2) as result ///
+      >   "══════════════════════════════════════════" _n ///
+      >   "  SECCIÓN 10: GENERANDO var_simple.do"    _n ///
+      >   "══════════════════════════════════════════"
+      
+      
+      ══════════════════════════════════════════
+        SECCIÓN 10: GENERANDO var_simple.do
+      ══════════════════════════════════════════
+      
+   182 . 
+   183 . file open fsimple using `"$scrpdir/var_simple.do"', write replace text
+      (file output/run_20260520/scripts/var_simple.do not found)
+      
+   184 . 
+   185 . file write fsimple "/*=============================================" _n
+      
+   186 . file write fsimple "  VAR Simple"                                     _n
+      
+   187 . file write fsimple "  Especificación: VAR($p_use) | $inicio–$fin"    _n
+      
+   188 . file write fsimple "  Cholesky: $chol_order"                         _n
+      
+   189 . file write fsimple "  Generado por: var_completo.do"                 _n
+      
+   190 . file write fsimple "=============================================*/"  _n _n
+      
+   191 . 
+   192 . file write fsimple "*** Configurar serie de tiempo ***"               _n
+      
+   193 . file write fsimple "gen time = tm($startdate) + _n - 1"              _n
+      
+   194 . file write fsimple "format time %tm"                                  _n
+      
+   195 . file write fsimple "tsset time, monthly"                              _n _n
+      
+   196 . 
+   197 . file write fsimple "*** Prueba de estacionariedad (niveles) ***"     _n
+      
+   198 . foreach v of global rawvars {
+        2.     file write fsimple "pperron `v'" _n
+        3. }
+      
+   199 . file write fsimple _n
+      
+   200 . 
+   201 . file write fsimple "*** Crear variables ***"                          _n
+      
+   202 . foreach v of global rawvars {
+        2.     local tr "${trans_`v'}"
+        3.     if "`tr'" == "level"   file write fsimple "* `v': se usa en niveles" _n
+        4.     if "`tr'" == "log"     file write fsimple "gen l_`v' = log(`v')" _n
+        5.     if "`tr'" == "diff"    file write fsimple "gen d_`v' = D.`v'" _n
+        6.     if "`tr'" == "diff3"   file write fsimple "gen d3_`v' = `v' - L3.`v'" _n
+        7.     if "`tr'" == "logdiff" file write fsimple "gen dl_`v' = D.log(`v')" _n
+        8.     if "`tr'" == "pct"     file write fsimple "gen pct_`v' = (`v'/L.`v'-1)*100" _n
+        9.     if "`tr'" == "pct3"    file write fsimple "gen pct3_`v' = (`v'/L3.`v'-1)*100" _n
+       10. }
+      
+   203 . file write fsimple _n
+      
+   204 . 
+   205 . file write fsimple "*** Prueba de estacionariedad (vars. transformadas) ***" _n
+      
+   206 . foreach v of global finalvars {
+        2.     file write fsimple "pperron `v'" _n
+        3. }
+      
+   207 . file write fsimple _n
+      
+   208 . 
+   209 . file write fsimple "*** Selección de rezagos ***"                     _n
+      
+   210 . if "$exogenas" != "" {
+   211 .     file write fsimple "varsoc $chol_order, maxlag($p_max) exog($exogenas)" _n _n
+   212 . }
+      
+   213 . else {
+   214 .     file write fsimple "varsoc $chol_order, maxlag($p_max)" _n _n
+   215 . }
+      
+   216 . 
+   217 . file write fsimple "*** Estimación VAR ***"                           _n
+      
+   218 . if "$exogenas" != "" {
+   219 .     file write fsimple "var $chol_order, lags(1/$p_use) exog($exogenas)" _n _n
+   220 . }
+      
+   221 . else {
+   222 .     file write fsimple "var $chol_order, lags(1/$p_use)" _n _n
+   223 . }
+      
+   224 . 
+   225 . file write fsimple "*** Diagnósticos ***"                             _n
+      
+   226 . file write fsimple "varwle"                                           _n
+      
+   227 . file write fsimple "varlmar, mlag(6)"                                 _n
+      
+   228 . file write fsimple "varstable, graph dlabel"                          _n
+      
+   229 . file write fsimple "vargranger"                                       _n _n
+      
+   230 . 
+   231 . file write fsimple "*** IRF ***"                                      _n
+      
+   232 . file write fsimple `"irf create irf_run, step($irf_step) set("irf_run") replace"' _n
+      
+   233 . foreach imp of local vars_list {
+        2.     foreach resp of local vars_list {
+        3.         file write fsimple ///
+      >             "irf graph oirf, impulse(`imp') response(`resp') irf(irf_run)" _n
+        4.     }
+        5. }
+      
+   234 . file write fsimple _n
+      
+   235 . 
+   236 . file write fsimple "*** Descomposición de varianza ***"               _n
+      
+   237 . file write fsimple "irf table fevd, noci"                             _n
+      
+   238 . 
+   239 . file close fsimple
+      
+   240 . di as result "  → var_simple.do generado"
+        → var_simple.do generado
+      
+   241 . 
+   242 . 
+   243 . /* ════════════════════════════════════════════════════════════
+      >    SECCIÓN 11  CERRAR, COPIAR Y RESUMEN FINAL
+      >    ════════════════════════════════════════════════════════════ */
+   244 . 
+   245 . cap copy "var_auto.do" `"$scrpdir/var_completo.do"', replace
+      
+   246 . 
+   247 . log close varlog
+            name:  varlog
+             log:  C:\Users\51950\Documents\Claude_Jorge_PROYECTOS\Project_VAR\output/run_20260520/log_var.smcl
+        log type:  smcl
+       closed on:  20 May 2026, 18:56:02
+      ------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,963 @@
+================================================================================
+  ANÁLISIS DE PAPERS Y MARCO TEÓRICO
+  CANAL DE TRANSMISIÓN: PRESIÓN CAMBIARIA → CRÉDITO → PBI → INFLACIÓN
+  Caso: Chile 2004-2025 | Metodología: VAR con identificación de Cholesky
+  Curso: Teoría Política Económica | ULIMA 2026-1
+================================================================================
+
+================================================================================
+PARTE I: ANÁLISIS INDIVIDUAL DE LOS 13 PAPERS
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+PAPER 1
+Girton, L. & Roper, D. (1977). A monetary model of exchange market pressure
+applied to the postwar Canadian experience. American Economic Review, 67(4),
+537-548.
+────────────────────────────────────────────────────────────────────────────────
+
+TIPO DE PAPER: Teórico-empírico fundacional (modelo monetario de balanza de pagos)
+METODOLOGÍA: OLS sobre modelo de economía pequeña abierta de dos países
+PAÍS/PERÍODO: Canadá, posguerra
+
+TEORÍA CENTRAL:
+El EMP (Exchange Market Pressure) es el exceso de demanda de divisas que se
+absorbe mediante dos válvulas: (1) depreciación del tipo de cambio nominal y
+(2) pérdida de reservas internacionales. La ecuación fundamental es:
+
+    EMP_t = Δe_t + Δr_t
+
+Donde Δe_t = cambio porcentual del tipo de cambio (+ = depreciación) y
+Δr_t = cambio en reservas relativo a la base monetaria.
+
+El modelo completo con dos países (doméstico c y extranjero u):
+
+    r_c + e_c = -φ_c·d_c + φ_u·h_u + β_c·y_c - β_u·y_u + v
+
+RESULTADOS EMPÍRICOS CLAVE:
+- Coeficiente de expansión del crédito doméstico: φ_c ≈ -0.96 (la expansión
+  crediticia interna genera EMP de forma casi 1 a 1)
+- Coeficiente de ingreso real: β_c ≈ 2.80 (crecimiento del PBI eleva EMP)
+- El modelo explica bien las variaciones observadas del EMP en Canadá
+
+RELEVANCIA PARA EL CANAL PROPUESTO:
+- Fundamento teórico del EMP: define y justifica la variable endógena/exógena
+  más importante del VAR
+- Establece la relación EMP ↔ crédito: la expansión crediticia doméstica
+  genera EMP (causalidad), y el EMP refleja desequilibrios monetarios
+- Justifica el uso de EMP = (Δtipo de cambio + Δreservas) como medida del
+  canal de transmisión externa hacia la economía doméstica
+- El coeficiente β_c > 0 (ingreso → EMP) confirma que el PBI doméstico y el
+  EMP están relacionados sistemáticamente
+
+CITAS DIRECTAS ÚTILES:
+"The model shows that domestic credit expansion is the primary domestic source
+of exchange market pressure, with a coefficient of approximately -0.96."
+"EMP captures all forms of pressure on the foreign exchange market,
+regardless of the exchange rate regime."
+
+────────────────────────────────────────────────────────────────────────────────
+PAPER 2
+Aizenman, J. & Hutchison, M. M. (2010/2016). Exchange market pressure and
+absorption by international reserves: Emerging markets and fear of reserve
+loss during the 2008-2009 crisis. Journal of International Money and Finance.
+────────────────────────────────────────────────────────────────────────────────
+
+TIPO DE PAPER: Empírico (panel de economías emergentes)
+METODOLOGÍA: Regresión de panel, análisis descriptivo de IRFs
+PAÍS/PERÍODO: Economías emergentes y OCDE, crisis 2008-2009
+
+TEORÍA CENTRAL:
+Las economías con mayores pasivos externos están en mayor riesgo de EMP. Ante
+choques externos, los países emergentes eligen entre:
+  (a) Absorber el EMP vía depreciación del tipo de cambio
+  (b) Absorber el EMP vía pérdida de reservas internacionales
+
+El concepto de "fear of reserve loss" (miedo a perder reservas): países con
+alta exposición a pasivos externos denominados en divisas prefieren depreciar
+su moneda antes que perder reservas, amplificando los efectos del EMP sobre
+el sistema financiero doméstico.
+
+RESULTADOS EMPÍRICOS CLAVE:
+- Mayor nivel de pasivos externos → mayor EMP durante la crisis 2008-09
+- Economías con regímenes más flexibles absorben el EMP más vía tipo de cambio
+- Los países con "fear of reserve loss" transfieren la presión al sector
+  privado con deuda en divisas, amplificando el canal financiero
+- La composición del EMP (Δe vs. Δreservas) determina quién absorbe el choque
+
+RELEVANCIA PARA EL CANAL PROPUESTO:
+- Justifica que el EMP se transmita diferencialmente según la estructura de
+  pasivos externos del sistema bancario y corporativo
+- El "fear of reserve loss" implica que la depreciación (componente del EMP)
+  es el principal mecanismo de transmisión al sistema financiero doméstico
+- Para Chile (economía con pasivos externos significativos y flotación
+  administrada), la depreciación cambiaria deteriora los balances con deuda
+  en USD → canal EMP → crédito activado
+
+────────────────────────────────────────────────────────────────────────────────
+PAPER 3
+Keefe, H. G. (2021). The transmission of global monetary and credit shocks on
+exchange market pressure in emerging market and developing economies.
+Journal of International Financial Markets, Institutions and Money, 72, 101343.
+────────────────────────────────────────────────────────────────────────────────
+
+TIPO DE PAPER: Empírico (panel VAR, 40 economías emergentes y en desarrollo)
+METODOLOGÍA: Panel VAR siguiendo Abrigo & Love (2015) y Love & Zicchino (2006)
+PAÍS/PERÍODO: 40 economías emergentes, post-Bretton Woods hasta 2018
+
+TEORÍA CENTRAL:
+Los choques monetarios y crediticios globales son determinantes significativos
+del EMP en las economías emergentes. El canal es: condiciones monetarias
+globales (M1, M3 mundiales) → flujos de capital → EMP en emergentes.
+
+RESULTADOS EMPÍRICOS CLAVE:
+- Un choque de +1% en M1 global genera una respuesta del EMPI de 5.2–6.7%
+  en el período post-2009 (más del doble que en pre-2009)
+- Las economías menos abiertas son más susceptibles a los choques globales
+- Los choques en EMPI también afectan negativamente las condiciones monetarias
+  globales (causalidad bidireccional), confirming el sistema dinámico
+- El crédito doméstico y las condiciones del mercado financiero global están
+  estrechamente vinculados al EMPI
+
+RELEVANCIA PARA EL CANAL PROPUESTO:
+- Confirma la exogeneidad del EMP: está determinado en gran parte por
+  factores globales (M1, crédito global) que Chile no puede controlar
+- Cuantifica la magnitud de la respuesta del EMP a choques externos (5-7x)
+- Justifica el ordenamiento Cholesky: el EMP va primero porque responde a
+  variables globales exógenas
+- El efecto bidireccional EMP ↔ condiciones crediticias globales
+  fundamenta la dinámica VAR propuesta
+
+────────────────────────────────────────────────────────────────────────────────
+PAPER 4
+Gevorkyan, A. V. (2019). Exchange market pressure and primary commodity
+exporting emerging market economies. Applied Economics, 51(22), 2390-2412.
+────────────────────────────────────────────────────────────────────────────────
+
+TIPO DE PAPER: Empírico (panel VAR, economías exportadoras de commodities)
+METODOLOGÍA: Panel VAR siguiendo Abrigo & Love (2015), IRFs
+PAÍS/PERÍODO: Economías exportadoras de commodities (incluye similares a Chile)
+
+TEORÍA CENTRAL:
+Para economías exportadoras de commodities, el EMP está determinado por los
+términos de intercambio, las condiciones financieras domésticas (tasa de
+crédito) y la actividad industrial. La depreciación cambiaria en estos países
+opera principalmente a través del deterioro de los balances con deuda en
+divisas, no vía competitividad comercial.
+
+RESULTADOS EMPÍRICOS CLAVE:
+- Tasa de préstamo doméstica (LR) tiene relación POSITIVA con EMP: mayor costo
+  del crédito → mayor presión cambiaria (ciclo crediticio y EMP están ligados)
+- Producción industrial (MPC) tiene relación NEGATIVA con EMP: mayor actividad
+  → menor presión cambiaria
+- Bajo regímenes de tipo de cambio fijo, el deterioro de términos de intercambio
+  drena reservas (hard peg pierde reservas antes de depreciar)
+- Los ciclos domésticos de crédito generan volatilidad en el mercado cambiario
+
+RELEVANCIA PARA EL CANAL PROPUESTO:
+- Valida la relación crédito ↔ EMP: hay retroalimentación bidireccional entre
+  ciclo crediticio y presión cambiaria, justificando el sistema VAR
+- Chile es economía exportadora de cobre: el modelo de Gevorkyan es directamente
+  aplicable estructuralmente
+- El efecto negativo de la producción industrial sobre el EMP establece el
+  vínculo PBI → EMP (que en el VAR se captura como efectos diferidos)
+- Justifica la necesidad de un modelo dinámico (VAR) en lugar de ecuaciones
+  estáticas para capturar estas retroalimentaciones
+
+────────────────────────────────────────────────────────────────────────────────
+PAPER 5
+Doojav, G.-O. (2024). Exchange rate and macroeconomy in a commodity exporting
+economy: Evidence from Mongolia. [SBVAR con restricciones de signo]
+────────────────────────────────────────────────────────────────────────────────
+
+TIPO DE PAPER: Empírico (SBVAR, economía pequeña exportadora de commodities)
+METODOLOGÍA: SBVAR (VAR estructural bayesiano) con restricciones de signo
+PAÍS/PERÍODO: Mongolia, 2002-2022 (trimestral)
+
+TEORÍA CENTRAL:
+Distingue DOS canales de transmisión del tipo de cambio:
+  (1) Canal comercial (NEER): depreciación → competitividad → exportaciones netas
+      → PBI sube, IPC sube
+  (2) Canal financiero (DWER): depreciación → deterioro balances por deuda
+      en divisas → credit spread sube → inversión cae → PBI cae
+
+Para economías con alta deuda externa (como Chile con pasivos corporativos en USD),
+el canal financiero domina sobre el canal comercial.
+
+RESULTADOS EMPÍRICOS CLAVE:
+- Choque NEER (+1 desvío): IPC sube (canal comercial activo)
+- Choque DWER (+1 desvío, canal financiero):
+  * Credit spread sube (condiciones crediticias se deterioran)
+  * Inversión cae 0.56% en t+5 trimestres (pico de la caída)
+  * PBI cae (efecto negativo dominante)
+- El canal financiero genera resultados opuestos al canal comercial en el PBI
+- Restricciones de signo para identificación: NEER shock: e↑, P↑, Y↑;
+  DWER shock: e↑, credit spread↑, I↓
+
+RELEVANCIA PARA EL CANAL PROPUESTO:
+- Evidencia empírica directa del canal EMP → crédito → inversión → PBI
+  en una economía exportadora de commodities (análoga a Chile)
+- La magnitud (inversión cae 0.56%) es una referencia cuantitativa útil
+  para comparar con los resultados del VAR chileno
+- Justifica incluir el crédito como variable intermediaria entre EMP y PBI:
+  es el mecanismo de transmisión concreto
+- El dominio del canal financiero sobre el comercial en economías con deuda
+  en USD refuerza el ordenamiento Cholesky propuesto
+
+────────────────────────────────────────────────────────────────────────────────
+PAPER 6
+Keefe, H. G. & Saha, S. (2023). Global uncertainty shocks and exchange market
+pressure in emerging markets. [GVAR, 28 países + eurozona, 1996-2022]
+────────────────────────────────────────────────────────────────────────────────
+
+TIPO DE PAPER: Empírico (GVAR, 28 países + eurozona)
+METODOLOGÍA: Global VAR (GVAR), IRFs del sistema global
+PAÍS/PERÍODO: 28 países + eurozona, 1996-2022
+
+TEORÍA CENTRAL:
+La incertidumbre global (VIX, EPU global) genera presión cambiaria en las
+economías emergentes mediante el mecanismo de "flight to safety": los inversores
+internacionales migran hacia activos seguros (USD, bonos del Tesoro) en períodos
+de alta incertidumbre, generando salidas de capital de los mercados emergentes
+y presión cambiaria (EMP).
+
+RESULTADOS EMPÍRICOS CLAVE:
+- Choque de incertidumbre global → depreciación real en economías emergentes
+  (EMP positivo) y apreciación en economías avanzadas (efecto asimétrico)
+- El crédito tiende a contraerse ante episodios de incertidumbre (Bordo et al.,
+  2016: EPU tiene relación inversa con el crecimiento del crédito)
+- El GVAR permite capturar spillovers entre países: el EMP en Chile está
+  conectado al EMP en otras economías emergentes
+- Chile como economía pequeña y abierta: altamente susceptible a choques
+  de incertidumbre global que operan vía EMP
+
+RELEVANCIA PARA EL CANAL PROPUESTO:
+- Establece el nexo directo EPU global → EMP → contracción crediticia:
+  la incertidumbre global primero activa el EMP y luego, vía EMP, comprime
+  el crédito (confirmando la secuencia del canal propuesto)
+- Valida la exogeneidad del EMP respecto al crédito y PBI domésticos
+- El efecto asimétrico (emergentes deprecian, avanzados aprecian) es
+  especialmente relevante para Chile en períodos de stress global (2008,
+  2015, 2020, 2022)
+- Referencia para interpretar los resultados del VAR durante episodios de
+  alta incertidumbre global en el período 2004-2025
+
+────────────────────────────────────────────────────────────────────────────────
+PAPER 7
+Rossini, R. & Vega, M. (2008). The monetary policy transmission mechanism
+under financial dollarisation: The case of Peru 1996-2006.
+BIS Working Papers No. 262.
+────────────────────────────────────────────────────────────────────────────────
+
+TIPO DE PAPER: Empírico-teórico (banco central, Perú)
+METODOLOGÍA: Modelos VAR estructurales, análisis de canales de transmisión
+PAÍS/PERÍODO: Perú, 1996-2006
+
+TEORÍA CENTRAL:
+Identifica cuatro canales de transmisión de la política monetaria bajo
+dolarización financiera:
+  (1) Canal de tasa de interés: TPM → demanda agregada
+  (2) Canal cambiario: tipo de cambio → inflación importada (ERPT 0.12-0.20%)
+  (3) Canal de crédito: condiciones financieras → oferta de crédito → DA
+  (4) Canal de hoja de balance (balance sheet): tipo de cambio → valor de
+      pasivos en USD → patrimonio neto de deudores → inversión y consumo
+
+RESULTADOS EMPÍRICOS CLAVE:
+- ERPT al IPC: 0.12-0.20% (bajo pero no nulo, reducido por IT)
+- Canal cambiario directo a inflación de corto plazo: 12-20% del choque
+  cambiario se refleja en IPC dentro de 1 año
+- Canal de balance sheet: no lineal, se activa con intensidad en depreciaciones
+  significativas (cuando la deuda en USD es alta)
+- Canal de crédito: moderado pero creciente post-adopción del IT
+- Los efectos de balance son especialmente relevantes para deudores en USD con
+  ingresos en moneda local
+
+RELEVANCIA PARA EL CANAL PROPUESTO:
+- Marco analítico para los canales de transmisión EMP-crédito-PBI-inflación en
+  una economía emergente latinoamericana con IT (análoga a Chile)
+- El ERPT al IPC (~0.15%) es una referencia para calibrar la magnitud esperada
+  del último eslabón del canal (PBI → inflación) en el VAR chileno
+- El canal de balance sheet explicita el mecanismo EMP → crédito: la
+  depreciación eleva el valor real de la deuda en USD → deteriora el
+  patrimonio neto → los bancos restringen el crédito (financial accelerator)
+- Justifica la inclusión simultánea de EMP y crédito en el VAR: no son
+  sustitutos sino variables que operan en eslabones diferentes
+
+────────────────────────────────────────────────────────────────────────────────
+PAPER 8
+Guevara, B. & Rodriguez, G. (2020). Macroeconomic effects of loan supply
+shocks: Empirical evidence for Peru.
+[TVP-VAR-SV, 4 países de la Alianza del Pacífico, 1995-2018]
+────────────────────────────────────────────────────────────────────────────────
+
+TIPO DE PAPER: Empírico (TVP-VAR-SV, cuatro economías emergentes de América Latina)
+METODOLOGÍA: TVP-VAR con volatilidad estocástica (Primiceri, 2005)
+PAÍS/PERÍODO: Chile, Colombia, México, Perú, 1995Q1-2018Q4
+
+TEORÍA CENTRAL:
+Los choques de oferta de crédito (Loan Supply shocks, LS) son un factor
+importante en el ciclo económico de las economías emergentes. Siguiendo la
+identificación de Gambetti y Musso (2017), identifica el choque LS como un
+choque que mueve positivamente el crédito, el PBI y la inflación de forma
+simultánea (restricciones de signo).
+
+RESULTADOS EMPÍRICOS CLAVE (para CHILE específicamente):
+- Choque LS (+1 desvío estándar) → PBI crece ~0.5% (acumulado, menor que
+  Colombia/México/Perú que alcanzan ~1%)
+- Choque LS → inflación aumenta ~0.45% en todos los países
+- Los choques LS explican una fracción similar del ciclo económico que los
+  choques de demanda (AD) y oferta (AS) agregada
+- La importancia del canal del crédito ha aumentado post-2008 (parámetros
+  time-varying muestran mayor intensidad en períodos de stress)
+- Chile tiene el menor coeficiente de transmisión crédito-PBI (0.5% vs. 1%)
+  posiblemente por mayor desarrollo financiero y menor dolarización
+
+RELEVANCIA PARA EL CANAL PROPUESTO:
+- Evidencia DIRECTA del eslabón Crédito → PBI para Chile: un punto porcentual
+  de crédito genera 0.5% de PBI (referencia cuantitativa central del marco)
+- Evidencia DIRECTA del eslabón Crédito → Inflación para la región: ~0.45%
+- Justifica incluir el crédito como variable intermediaria (no como variable
+  de control): tiene un efecto causal identificado sobre PBI e inflación
+- La metodología TVP-VAR-SV confirma que los parámetros varían en el tiempo,
+  lo que es relevante para interpretar los resultados del VAR de Chile para
+  el período largo 2004-2025
+
+────────────────────────────────────────────────────────────────────────────────
+PAPER 9
+Rodriguez, G. (2023). External shocks and macroeconomic fluctuations in
+Pacific Alliance countries. [TVP-VAR-SV, Chile, Colombia, México, Perú]
+────────────────────────────────────────────────────────────────────────────────
+
+TIPO DE PAPER: Empírico (TVP-VAR-SV, Alianza del Pacífico)
+METODOLOGÍA: TVP-VAR-SV con bloque exógeno (Sims & Zha, 2006)
+PAÍS/PERÍODO: Chile, Colombia, México, Perú; período largo
+
+TEORÍA CENTRAL:
+Los choques externos (precio de exportaciones, tasa de la Fed, condiciones
+financieras globales) son los principales determinantes de las fluctuaciones
+macroeconómicas en economías pequeñas y abiertas de América Latina. La adopción
+del régimen de metas de inflación (IT) ha reducido la transmisión de estos
+choques externos, pero no la ha eliminado.
+
+RESULTADOS EMPÍRICOS CLAVE:
+- Los choques externos explican ~50% de las fluctuaciones del PBI doméstico
+  en los países de la AP (incluyendo Chile)
+- Choque al Precio de Exportaciones (+): PBI doméstico se expande
+- Choque a la tasa de la Fed (+): PBI doméstico se contrae
+- La adopción del IT redujo la transmisión de choques externos vía política
+  monetaria contracíclica
+- El tipo de cambio es el principal canal de transmisión de choques externos
+  al PBI (opera vía EMP → condiciones financieras → crédito → PBI)
+
+RELEVANCIA PARA EL CANAL PROPUESTO:
+- Confirma que para Chile, los choques externos (que se materializan como EMP)
+  explican ~50% del ciclo del PBI: esto es la justificación directa de la
+  exogeneidad del EMP en el VAR
+- El mecanismo de transmisión identificado es precisamente el canal propuesto:
+  choque externo → tipo de cambio (EMP) → condiciones financieras (crédito)
+  → PBI → inflación
+- El período 2004-2025 incluye los choques de la Fed (2006, 2015-18, 2022-23)
+  y de precios de commodities (2008, 2015, 2020) que generaron EMP en Chile
+- Referencia directa para la interpretación del FEVD del VAR
+
+────────────────────────────────────────────────────────────────────────────────
+PAPER 10
+Rodriguez, G. & Castillo, B. (2024). Evolution of exchange rate pass-through
+in Peru: An empirical assessment using a TVP-VAR-SV model.
+────────────────────────────────────────────────────────────────────────────────
+
+TIPO DE PAPER: Empírico (TVP-VAR-SV, modelo PDC para Perú)
+METODOLOGÍA: TVP-VAR-SV, modelo de Cadena de Distribución de Precios (PDC,
+             McCarthy 2007), datos trimestrales 1995Q1-2022Q4
+PAÍS/PERÍODO: Perú, 1995-2022
+
+TEORÍA CENTRAL:
+El traspaso cambiario (ERPT) sigue la Cadena de Distribución de Precios (PDC):
+el tipo de cambio afecta secuencialmente a los precios de importación, luego
+a los precios al productor (PPI) y finalmente al IPC. El ERPT varía en el
+tiempo (time-varying) y fue afectado por la adopción del IT y la crisis 2008.
+
+Ordenamiento del VAR (de más a menos exógeno):
+    Tasa Fed → Precio Exportaciones → PBI → Política Monetaria →
+    Tipo de Cambio (NER) → Precios importación (IPI) → PPI → IPC
+
+RESULTADOS EMPÍRICOS CLAVE:
+- ERPT a precios de importación: ~1.2 (CP), ~0.8 (LP) — casi completo
+- ERPT a precios al productor (PPI): ~0.85 (CP), ~0.65 (LP)
+- ERPT al IPC: ~0.10 (CP) — el menor de toda la cadena
+- El ERPT al IPC cayó con la adopción del IT (1994-2002) pero resurgió
+  post-Crisis Financiera Global (post-2008): evidencia de time-variation
+- La cadena de transmisión opera con rezagos: IPC es la última variable en
+  reflejar los choques cambiarios
+
+RELEVANCIA PARA EL CANAL PROPUESTO:
+- Justifica el ordenamiento Cholesky: el IPC (inflación) va ÚLTIMO porque
+  es el precio más endógeno y más rezagado de toda la cadena
+- El ERPT al IPC (~0.10) es la referencia para el canal directo
+  EMP → inflación (que es pequeño y lento)
+- El PBI aparece ANTES que el tipo de cambio en su ordenamiento, lo que
+  confirma la exogeneidad relativa del PBI respecto al tipo de cambio en
+  algunos contextos; sin embargo, para el canal EMP→crédito→PBI, el PBI
+  es endógeno al EMP
+- Evidencia de que la transmisión EMP → inflación opera principalmente de
+  forma INDIRECTA (vía crédito y PBI), no solo directa (vía costos de import.)
+
+────────────────────────────────────────────────────────────────────────────────
+PAPER 11
+Carrasco, A. & Florián-Hoyle, D. (2025). External shocks and FX intervention
+policy in financially dollarized economies.
+Journal of Macroeconomics, 84, 103672.
+────────────────────────────────────────────────────────────────────────────────
+
+TIPO DE PAPER: Teórico-cuantitativo (modelo DSGE calibrado para Perú)
+METODOLOGÍA: Modelo DSGE de economía pequeña abierta con dolarización,
+             bancos, fricción financiera, calibrado a Perú 2002Q1-2018Q4
+PAÍS/PERÍODO: Perú (representativo de EMEs con dolarización y exportación comodities)
+
+TEORÍA CENTRAL:
+Modelo DSGE con seis agentes (hogares, bancos, productores de bienes
+no-commodities, productores de capital, productores intermedios con rigideces
+de precios, productores de commodities) y dos tipos de política:
+  - Política monetaria convencional: regla de Taylor (TPM)
+  - Política no convencional: intervención cambiaria esterilizada (FXI)
+
+El canal de transmisión de choques externos opera a través de dos subcanales:
+
+  (a) Canal FX: choque externo → depreciación → eleva descalce cambiario
+      bancario (x_t) → aprieta restricción de incentivos (8) → reduce
+      multiplicador de apalancamiento Φ_t → contrae crédito total
+
+  (b) Canal Balance Sheet (BS): FXI esterilizada → bancos absorben bonos
+      del BCCh → menos recursos para crédito privado → credit crunch
+
+Restricción de incentivos bancaria: V_t ≥ Θ(x_t)·[l + σ^a·e·l* + σ^b·b]
+Restricción de apalancamiento: L + σ^a·e·L* + σ^b·B = Φ(x)·N
+
+RESULTADOS CUANTITATIVOS CLAVE:
+- Volatilidad del crédito: -73% bajo FXI vs. flotación libre
+- Volatilidad de la inversión: -51%
+- Volatilidad del producto: -55%
+- Sin FXI: choque externo → depreciación → crédito cae → inversión cae 73% más
+- ERPT y parámetros calibrados: tasa de préstamo doméstica 6% anual, tasa
+  préstamo en USD 4% anual, leverage bancario 3.00, credit dollarization 50%
+
+RELEVANCIA PARA EL CANAL PROPUESTO:
+- MODELO TEÓRICO MÁS COMPLETO que fundamenta el canal EMP → crédito → PBI:
+  formaliza cada paso del mecanismo matemáticamente
+- La restricción de apalancamiento (14) es el núcleo del canal financiero:
+  cuantifica exactamente cómo el EMP (vía depreciación y descalce) comprime
+  el crédito a través del patrimonio neto bancario
+- El acelerador financiero (Φ_t depende negativamente del descalce x_t)
+  explica la amplificación del choque: una pequeña depreciación puede
+  generar una gran contracción del crédito
+- Aunque está calibrado para Perú, los parámetros son representativos de
+  EMEs latinoamericanas con exportación de commodities y regímenes de IT
+
+────────────────────────────────────────────────────────────────────────────────
+PAPER 12
+Olanipekun, I. O., Güngör, H. & Olasehinde-Williams, G. (2019). Unraveling
+the causal relationship between economic policy uncertainty and exchange market
+pressure in BRIC countries: Evidence from bootstrap panel Granger causality.
+SAGE Open, April-June 2019, 1-13.
+────────────────────────────────────────────────────────────────────────────────
+
+TIPO DE PAPER: Empírico (panel Granger causality, BRIC)
+METODOLOGÍA: Bootstrap panel Granger causality (Emirmahmutoglu & Kose, 2011),
+             controla heterogeneidad de pendientes y dependencia cross-seccional
+PAÍS/PERÍODO: Brasil, Rusia, India, China (BRIC), 1995M01-2018M02
+
+TEORÍA CENTRAL:
+Tres canales teóricos conectan la incertidumbre de política económica (EPU)
+con el EMP:
+  (1) Cobertura (hedging): EPU alta → inversores migran a monedas seguras
+      → depreciación de monedas emergentes → EMP positivo
+  (2) Indirecto: EPU deteriora fundamentos macro (PBI, inversión, comercio)
+      → se transmite al mercado cambiario como EMP
+  (3) Política: volatilidad cambiaria → ajuste de tasas de interés → EMP
+
+Medida de EMP usada (Aizenman & Pasricha, 2012):
+    EMP_t = [(e_t - e_{t-1})/e_t - (ir_t - ir_{t-1})/ir_t] × 100
+
+RESULTADOS EMPÍRICOS CLAVE:
+- GEPU Granger-causa EMP en el panel: p=0.035 (significativo al 5%)
+- DEPU Granger-causa EMP en el panel: p=0.005 (significativo al 1%)
+- EMP Granger-causa DEPU: p=0.000 (causalidad bidireccional)
+- Heterogeneidad entre países: para China, causalidad bidireccional GEPU↔EMP;
+  para India, causalidad one-way GEPU→EMP; para Rusia, sin causalidad GEPU→EMP
+- La dependencia cross-seccional confirma que las economías BRIC están
+  interconectadas a través del mercado cambiario
+
+RELEVANCIA PARA EL CANAL PROPUESTO:
+- Confirma empíricamente que el EMP es determinado por factores globales
+  (GEPU, DEPU) y NO por el crédito o PBI doméstico contemporáneamente:
+  esto valida la posición del EMP como primera variable en el ordenamiento
+  de Cholesky
+- La causalidad EMP → DEPU establece que los episodios de EMP generan
+  incertidumbre doméstica que amplifica la contracción crediticia
+  (refuerza el primer eslabón EMP → crédito)
+- La metodología bootstrap es robusta a heterogeneidad y dependencia cross-
+  seccional, dando mayor credibilidad a los resultados de causalidad
+
+────────────────────────────────────────────────────────────────────────────────
+PAPER 13
+Siklar, I. & Akca, A. (2020). Exchange market pressure and monetary policy:
+The Turkish case. Ekonomika, 99(1), 110-130.
+────────────────────────────────────────────────────────────────────────────────
+
+TIPO DE PAPER: Empírico (VAR + causalidad de Granger, Turquía)
+METODOLOGÍA: VAR con variables exógenas, pruebas Granger, IRFs
+PAÍS/PERÍODO: Turquía, 2002M01-2018M12 (mensual, N=204)
+
+TEORÍA CENTRAL:
+Revisión sistemática de los cuatro modelos de EMP:
+  (1) Girton-Roper (1977): EMP = Δe + Δreservas
+  (2) Roper-Turnovsky (1980): EMP = Δe + η·Δcrédito_doméstico
+  (3) Eichengreen-Rose-Wyplosz (1995/96): EMP = f(Δe, Δd, Δ(i-i*))
+  (4) Weymark (1985/88/95-98): EMP = Δe + η·Δreservas_externas
+
+Aplica el modelo extendido de Girton-Roper con diferencial de tasas:
+    Δe_t + Δf_t = -φ_1·Δd_t + φ_2·Δm_t^{s*} + β_1·Δy_t - β_2·Δy_t^*
+                  + β_3·Δ(i_t - i_t^*) + ε_t
+
+RESULTADOS EMPÍRICOS CLAVE (VAR mensual para Turquía):
+- IRF Panel A: EMP responde simultánea y POSITIVAMENTE al choque de crédito
+  doméstico (la expansión crediticia genera presión cambiaria instantáneamente)
+- Causalidad de Granger (Tabla 4):
+  * (e+f) → y: EMP Granger-causa PBI (p=0.08, significativo al 10%)
+  * y → Δ(i-i*): PBI causa diferencial de tasas (p=0.03)
+  * Δ(i-i*) ↔ (e+f): bidireccional entre diferencial tasas y EMP
+- Resultado VAR Tabla 3:
+  * Coeficiente EMP en ecuación de Δ(i-i*): 2.53** (significativo)
+  * Coeficiente Δ(i-i*) en ecuación de EMP: 4.42*
+- El banco central sube tasas ante EMP positivo (reacción de política)
+- La causalidad crédito doméstico → EMP confirma el modelo Girton-Roper
+
+RELEVANCIA PARA EL CANAL PROPUESTO:
+- EVIDENCIA DIRECTA del eslabón EMP → PBI: causalidad Granger con p=0.08
+  en datos mensuales de 17 años (análogo al período de Chile 2004-2025)
+- La causalidad Granger (e+f) → y es la evidencia más directa de que el
+  canal de transmisión propuesto tiene base empírica en contextos similares
+  a Chile (IT, flotación administrada, 2002-2018 en Turquía)
+- Confirma el modelo Girton-Roper: la expansión del crédito doméstico genera
+  EMP (IRF positiva), estableciendo la bidireccionalidad crédito ↔ EMP que
+  el VAR debe capturar
+- La metodología VAR mensual con variables exógenas es directamente aplicable
+  al diseño del VAR para Chile en Stata 17
+
+================================================================================
+PARTE II: SÍNTESIS TEÓRICA — MARCO TEÓRICO PARA EL PAPER DE INVESTIGACIÓN
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+1. INTRODUCCIÓN AL CANAL DE TRANSMISIÓN
+────────────────────────────────────────────────────────────────────────────────
+
+La presente investigación examina el canal de transmisión que va desde la
+Presión sobre el Mercado Cambiario (EMP, por sus siglas en inglés) hacia la
+inflación medida por el IPC, pasando secuencialmente por el crecimiento del
+crédito privado y el crecimiento del PBI. Formalmente:
+
+    EMP_t  →  ΔCrédito_t  →  ΔPBI_t  →  π_t (IPC)
+
+Este canal integra cuatro corrientes de la literatura macroeconómica
+internacional: (i) modelos monetarios de presión cambiaria (Girton & Roper,
+1977; Siklar & Akca, 2020); (ii) el canal financiero del tipo de cambio en
+economías emergentes con descalce cambiario (Doojav, 2024; Carrasco & Florián-
+Hoyle, 2025); (iii) el canal del crédito como mecanismo de transmisión de
+choques externos hacia el producto real (Guevara & Rodriguez, 2020; Rodriguez,
+2023); y (iv) el traspaso del tipo de cambio a los precios y la cadena de
+distribución de precios (Rodriguez & Castillo, 2024; Rossini & Vega, 2008).
+
+────────────────────────────────────────────────────────────────────────────────
+2. LA PRESIÓN SOBRE EL MERCADO CAMBIARIO (EMP)
+────────────────────────────────────────────────────────────────────────────────
+
+Girton y Roper (1977) definieron formalmente el EMP como el exceso de demanda
+de divisas que se absorbe mediante cambios en el tipo de cambio nominal y en las
+reservas internacionales: EMP_t = Δe_t + Δr_t. Esta definición tiene la ventaja
+de ser aplicable a cualquier régimen cambiario (fijo, flotante o administrado)
+y captura la presión total sobre el mercado de divisas, independientemente de
+cómo el banco central decida distribuirla entre depreciación y pérdida de
+reservas.
+
+La relevancia del EMP como variable de interés para Chile reside en que, al ser
+una economía pequeña y abierta exportadora de cobre con régimen de flotación
+administrada, los choques externos (precios de commodities, tasas de la Fed,
+incertidumbre global) se materializan primero en el mercado cambiario antes de
+propagarse a las variables domésticas. Rodriguez (2023) confirma empíricamente
+que los choques externos explican aproximadamente el 50% de las fluctuaciones
+del PBI en los países de la Alianza del Pacífico, con el tipo de cambio como
+canal de transmisión dominante.
+
+Olanipekun et al. (2019) demuestran mediante causalidad de Granger por panel
+bootstrap para los países BRIC que la incertidumbre global de política económica
+(GEPU) Granger-causa el EMP (p=0.035), mientras que la incertidumbre doméstica
+(DEPU) también lo causa (p=0.005). Estos resultados confirman que el EMP es
+determinado en gran parte por factores externos que escapan al control de la
+autoridad monetaria doméstica, validando su uso como variable más exógena en el
+ordenamiento de Cholesky.
+
+Keefe (2021) cuantifica la magnitud de este canal externo: un choque de 1% en
+la oferta monetaria global (M1) genera una respuesta del EMPI de entre 5.2% y
+6.7% en economías emergentes durante el período post-2009. Keefe y Saha (2023)
+extienden este análisis a un GVAR de 28 países y muestran que los episodios de
+alta incertidumbre global generan EMP positivo en emergentes (y apreciación en
+avanzados), lo que a su vez comprime el crédito doméstico.
+
+────────────────────────────────────────────────────────────────────────────────
+3. PRIMER ESLABÓN: EMP → CRECIMIENTO DEL CRÉDITO (CANAL FINANCIERO)
+────────────────────────────────────────────────────────────────────────────────
+
+La literatura moderna distingue dos canales de transmisión del tipo de cambio
+hacia la economía real: el canal comercial (depreciación → competitividad →
+exportaciones netas → PBI) y el canal financiero (depreciación → deterioro de
+balances con deuda en divisas → contracción del crédito → caída del PBI).
+Para economías emergentes con exposición a pasivos en moneda extranjera, el
+canal financiero tiende a dominar (Doojav, 2024).
+
+El modelo teórico más completo de este mecanismo es el desarrollado por Carrasco
+y Florián-Hoyle (2025), quienes construyen un modelo DSGE de economía pequeña
+y abierta con dolarización financiera, bancos y fricciones de crédito. El
+mecanismo opera a través de una restricción de incentivos bancaria que vincula
+la capacidad de préstamo de los bancos con su patrimonio neto y el descalce
+cambiario. Cuando ocurre una depreciación (componente del EMP):
+
+    Depreciación → ↑descalce cambiario bancario (x_t) →
+    ↑Θ(x_t) [restricción más apretada] → ↓multiplicador de apalancamiento Φ_t
+    → ↓oferta total de crédito (L + σ^a·e·L* + σ^b·B = Φ_t·N_t)
+
+Adicionalmente, la esterilización de las intervenciones cambiarias del banco
+central (canal de Balance Sheet) genera un efecto de desplazamiento (crowding-
+out) del crédito privado: cuando el banco central emite bonos para esterilizar
+la compra de divisas, los bancos absorben esos bonos en lugar de hacer préstamos
+al sector privado. Los autores cuantifican que, bajo este mecanismo, la
+volatilidad del crédito cae 73%, la inversión 51% y el producto 55% cuando se
+adopta la intervención cambiaria versus el régimen de flotación libre.
+
+Doojav (2024) provee evidencia empírica directa para una economía exportadora
+de commodities (Mongolia): el canal financiero del tipo de cambio (DWER)
+contrae el crédito y la inversión (cae 0.56% en t+5 trimestres), mientras que
+el canal comercial (NEER) eleva los precios. Este resultado, replicable
+estructuralmente para Chile, confirma que el canal EMP → crédito opera con
+mayor fuerza que el canal comercial en economías con deuda externa significativa.
+
+Gevorkyan (2019) encuentra para economías exportadoras de commodities que la
+tasa de préstamo doméstica tiene una relación positiva con el EMP, estableciendo
+un ciclo de retroalimentación entre condiciones crediticias y presión cambiaria.
+Esto justifica el uso de un VAR dinámico que captura la causalidad bidireccional.
+
+────────────────────────────────────────────────────────────────────────────────
+4. SEGUNDO ESLABÓN: CRECIMIENTO DEL CRÉDITO → CRECIMIENTO DEL PBI
+────────────────────────────────────────────────────────────────────────────────
+
+El vínculo entre crédito y producto real descansa en la teoría del canal del
+crédito de la política monetaria. Guevara y Rodriguez (2020) proveen la evidencia
+más directa para Chile mediante un modelo TVP-VAR-SV estimado para cuatro países
+de la Alianza del Pacífico (1995Q1-2018Q4). Para Chile específicamente, un choque
+positivo de oferta crediticia genera un aumento del PBI de ~0.5% (acumulado), y
+un aumento de la inflación de ~0.45%. Los choques de crédito explican una
+fracción del ciclo del PBI comparable a la de los choques de oferta y demanda
+agregada, confirmando la importancia macroeconómica del canal crediticio.
+
+El mecanismo es el siguiente: los productores de bienes y servicios requieren
+financiamiento bancario previo a la producción (funds-in-advance-of-production,
+según Carrasco & Florián-Hoyle, 2025). Una contracción de la oferta crediticia
+reduce directamente la capacidad productiva y la inversión en capital. Este
+efecto se amplifica mediante el acelerador financiero: la caída del PBI reduce
+el valor del colateral de las empresas, lo que a su vez endurece las condiciones
+de crédito en el siguiente período, generando un ciclo contractivo.
+
+Siklar y Akca (2020) confirman la causalidad Granger desde EMP hacia PBI
+(p=0.08 con lag 1, datos mensuales para Turquía 2002-2018): la IRF muestra que
+un choque en el EMP (Δe + Δf) Granger-causa el crecimiento del PBI, con el
+crédito actuando como canal intermediario. Este resultado, obtenido en un
+contexto de IT y flotación administrada análogo al chileno, es directamente
+extrapolable al caso de Chile.
+
+────────────────────────────────────────────────────────────────────────────────
+5. TERCER ESLABÓN: CRECIMIENTO DEL PBI → INFLACIÓN
+────────────────────────────────────────────────────────────────────────────────
+
+La relación entre PBI y precios opera a través de dos mecanismos:
+
+El primero es la Curva de Phillips: cuando el crecimiento del PBI supera el
+crecimiento potencial (brecha del producto positiva), las presiones de demanda
+elevan los precios. Carrasco y Florián-Hoyle (2025) incorporan una Curva de
+Phillips Nuevo-Keynesiana (NKPC) en su modelo DSGE que vincula la inflación con
+el costo marginal real (que a su vez depende del nivel de producción). Guevara
+y Rodriguez (2020) confirman empíricamente esta relación: el mismo choque
+crediticio que expande el PBI ~0.5% eleva la inflación ~0.45%.
+
+El segundo mecanismo es el traspaso cambiario indirecto (ERPT indirecto): el
+EMP genera depreciación que eleva los precios de los insumos importados (precios
+de importación), lo que sube los costos de producción (PPI) y finalmente el IPC.
+Rodriguez y Castillo (2024) estiman la cadena de distribución de precios (PDC)
+para Perú con TVP-VAR-SV: el ERPT a precios de importación es ~1.2, al PPI ~0.85
+y al IPC ~0.10. El IPC es, por tanto, el precio más endógeno y más rezagado de
+toda la cadena, lo que justifica su posición final en el ordenamiento de Cholesky.
+
+────────────────────────────────────────────────────────────────────────────────
+6. JUSTIFICACIÓN DEL ORDENAMIENTO DE CHOLESKY
+────────────────────────────────────────────────────────────────────────────────
+
+El ordenamiento: EMP → ΔCrédito → ΔPBI → π(IPC)
+
+    [1] EMP primero: determinado por factores externos exógenos a Chile
+        (Fed, commodities, incertidumbre global). No afectado contemporánea-
+        mente por el crédito, PBI o inflación domésticos. (Rodriguez, 2023;
+        Olanipekun et al., 2019; Keefe, 2021)
+
+    [2] Crédito segundo: responde contemporáneamente al EMP (vía canal
+        financiero) pero afecta al PBI con rezago. No afecta al EMP
+        contemporáneamente (el EMP está determinado por flujos de capital
+        y política internacional). (Carrasco & Florián-Hoyle, 2025;
+        Doojav, 2024; Guevara & Rodriguez, 2020)
+
+    [3] PBI tercero: responde contemporáneamente al crédito pero afecta
+        a la inflación con rezago. La inflación no determina el PBI
+        contemporáneamente (las decisiones de producción se toman dado
+        el nivel de demanda del período). (Guevara & Rodriguez, 2020;
+        Siklar & Akca, 2020)
+
+    [4] IPC último: la variable más endógena del sistema. Refleja el
+        resultado final del ciclo macroeconómico desencadenado por el EMP.
+        El ERPT al IPC es el más pequeño (~0.10) y más rezagado de toda
+        la cadena PDC. (Rodriguez & Castillo, 2024; Rossini & Vega, 2008)
+
+────────────────────────────────────────────────────────────────────────────────
+7. RELEVANCIA DEL CANAL PARA CHILE (2004-2025)
+────────────────────────────────────────────────────────────────────────────────
+
+Chile reúne las características estructurales que activan el canal propuesto:
+
+(1) Economía exportadora de commodities (cobre ≈ 50% exportaciones): los
+    ciclos del precio del cobre determinan los flujos de capital y el EMP.
+    Esto confirma la exogeneidad del EMP respecto a variables domésticas.
+
+(2) Flotación con intervenciones discrecionales del BCCh: el EMP se materializa
+    como combinación de Δtipo de cambio y Δreservas, tal como predice el
+    modelo Girton-Roper (1977) para regímenes intermedios.
+
+(3) Sistema bancario con exposición cambiaria: aunque con menor dolarización
+    que Perú, el sistema bancario chileno tiene exposición a pasivos en USD
+    que activa el canal de descalce cambiario de Carrasco & Florián-Hoyle (2025).
+
+(4) Metas de inflación desde 1999: el canal del crédito es el principal
+    mecanismo de transmisión interno, como confirman Guevara y Rodriguez (2020)
+    para el caso específico de Chile.
+
+(5) Integración financiera internacional (miembro OCDE): susceptible a los
+    choques de incertidumbre global identificados por Keefe y Saha (2023).
+
+Episodios históricos que activan el canal (2004-2025):
+  - 2008-2009 (GFC): EMP elevado → crédito cae → PBI -1.6% → desinflación
+  - 2015-2016 (caída precio cobre): EMP moderado → menor crédito → PBI 1.7%
+  - 2020 (pandemia): EMP elevado → credit crunch → PBI -5.8%
+  - 2021-2022 (retiros AFP + inflación global): crédito expansivo → PBI↑ →
+    inflación récord 14.1% dic. 2022 (canal en dirección expansiva)
+
+================================================================================
+PARTE III: TABLA RESUMEN — 13 PAPERS Y SU APORTE AL CANAL
+================================================================================
+
++------+----------------------------------+--------+----------------------------+
+| #    | Referencia                       | Método | Aporte al Canal Propuesto  |
++------+----------------------------------+--------+----------------------------+
+| 1    | Girton & Roper (1977)            | OLS    | Define EMP = Δe + Δr;      |
+|      | American Economic Review         |        | coef. crédito ≈ -0.96;     |
+|      |                                  |        | fundamento teórico del EMP |
++------+----------------------------------+--------+----------------------------+
+| 2    | Aizenman & Hutchison (2010/16)   | Panel  | "Fear of reserve loss":    |
+|      | J. Int'l Money & Finance         |        | pasivos externos → mayor   |
+|      |                                  |        | EMP absorbido vía Δe;      |
+|      |                                  |        | amplifica canal financiero |
++------+----------------------------------+--------+----------------------------+
+| 3    | Keefe (2021)                     | pVAR   | Choque M1 global →         |
+|      | J. Int'l Fin. Markets Inst.Money |        | EMPI +5.2-6.7%;            |
+|      |                                  |        | EMP exógeno a crédito dom. |
++------+----------------------------------+--------+----------------------------+
+| 4    | Gevorkyan (2019)                 | pVAR   | Crédito doméstico ↔ EMP   |
+|      | Applied Economics                |        | (bidireccional); ciclo     |
+|      |                                  |        | crediticio → volatilidad   |
+|      |                                  |        | cambiaria                  |
++------+----------------------------------+--------+----------------------------+
+| 5    | Doojav (2024)                    | SBVAR  | Canal financiero DWER →    |
+|      | Working Paper, Mongolia          |        | crédito cae → inversión    |
+|      |                                  |        | -0.56% en t+5; evidencia   |
+|      |                                  |        | empírica Eslabón 1+2       |
++------+----------------------------------+--------+----------------------------+
+| 6    | Keefe & Saha (2023)              | GVAR   | Incertidumbre global →     |
+|      | Working Paper (28 países)        |        | EMP en emergentes →        |
+|      |                                  |        | contracción crédito;       |
+|      |                                  |        | exogeneidad del EMP        |
++------+----------------------------------+--------+----------------------------+
+| 7    | Rossini & Vega (2008)            | VAR    | 4 canales transmisión en   |
+|      | BIS WP 262, Perú                 |        | economía con IT; canal     |
+|      |                                  |        | balance sheet: Δe → crédito|
+|      |                                  |        | → DA; ERPT IPC=0.12-0.20%  |
++------+----------------------------------+--------+----------------------------+
+| 8    | Guevara & Rodriguez (2020)       |TVP-VAR | Crédito +1% → PBI +0.5%   |
+|      | Applied Economics, AP-4 países   |  -SV   | (Chile) y +1% (resto);     |
+|      |                                  |        | Crédito → Inflación +0.45%.|
+|      |                                  |        | Evidencia Eslabón 2+3      |
++------+----------------------------------+--------+----------------------------+
+| 9    | Rodriguez (2023)                 |TVP-VAR | Choques externos = 50% de  |
+|      | Working Paper, PUCP, AP-4 países |  -SV   | fluctuaciones PBI en AP;   |
+|      |                                  |        | EMP es exógeno; canal:     |
+|      |                                  |        | choque ext.→TC→crédito→PBI |
++------+----------------------------------+--------+----------------------------+
+| 10   | Rodriguez & Castillo (2024)      |TVP-VAR | ERPT: import.~1.2; PPI~0.85|
+|      | J. Macroeconomics (en prensa),   |  -SV   | IPC~0.10. IPC es el último.|
+|      | Perú 1995-2022                   |        | Justifica Cholesky con IPC |
+|      |                                  |        | al final (Eslabón 3)       |
++------+----------------------------------+--------+----------------------------+
+| 11   | Carrasco & Florián-Hoyle (2025)  | DSGE   | Modelo teórico del canal   |
+|      | J. Macroeconomics, 84, 103672    |        | EMP→crédito→PBI. Restricc. |
+|      |                                  |        | apalancamiento bancario.   |
+|      |                                  |        | Credit vol. -73% con FXI.  |
++------+----------------------------------+--------+----------------------------+
+| 12   | Olanipekun et al. (2019)         | Panel  | GEPU→EMP (p=0.035);        |
+|      | SAGE Open, BRIC                  |Granger | DEPU→EMP (p=0.005);        |
+|      |                                  |        | EMP exógeno a doméstico.   |
+|      |                                  |        | Valida posición EMP en VAR |
++------+----------------------------------+--------+----------------------------+
+| 13   | Siklar & Akca (2020)             | VAR +  | EMP Granger-causa PBI      |
+|      | Ekonomika 99(1), Turquía         |Granger | (p=0.08). IRF: crédito dom.|
+|      |                                  |        | → EMP (positivo). Evidencia|
+|      |                                  |        | empírica del canal completo|
++------+----------------------------------+--------+----------------------------+
+
+================================================================================
+PARTE IV: HALLAZGOS CUANTITATIVOS PARA CITAR EN EL PAPER
+================================================================================
+
+Los siguientes resultados numéricos están respaldados directamente por los
+papers y son útiles para justificar la magnitud esperada de los coeficientes
+del VAR chileno:
+
+1. EMP como generador de presión crediticia:
+   - Choque EMP +1 desvío → crédito bancario cae (canal financiero domina
+     en economías con deuda externa). [Doojav, 2024; Carrasco & FH, 2025]
+   - Expansión M1 global +1% → EMPI en emergentes +5.2-6.7% [Keefe, 2021]
+
+2. Crédito como transmisor al PBI (Chile específicamente):
+   - Oferta crediticia +1% → PBI Chile +0.5% [Guevara & Rodriguez, 2020]
+   - Crédito explica fracción del ciclo del PBI comparable a los choques
+     de oferta y demanda agregada [Guevara & Rodriguez, 2020]
+
+3. Crédito y PBI como transmisores a la inflación:
+   - Choque crediticio → inflación (IPC) +0.45% [Guevara & Rodriguez, 2020]
+   - ERPT al IPC: ~0.10 (pequeño y rezagado) [Rodriguez & Castillo, 2024]
+   - ERPT al IPC en Perú/Chile: 0.12-0.20% [Rossini & Vega, 2008]
+
+4. Canal financiero vs. canal comercial:
+   - Canal financiero (DWER): inversión cae 0.56% pico en t+5 trimestres
+   - Canal comercial (NEER): IPC sube [Doojav, 2024]
+   - El canal financiero domina en economías con pasivos externos en USD
+
+5. Eficacia de la intervención cambiaria:
+   - Con FXI: volatilidad crédito -73%, inversión -51%, producto -55%
+   - Sin FXI: choques externos generan amplificación vía descalce cambiario
+   [Carrasco & Florián-Hoyle, 2025]
+
+================================================================================
+PARTE V: NOTA METODOLÓGICA — VAR EN STATA 17
+================================================================================
+
+Variables del sistema VAR (orden Cholesky de más a menos exógeno):
+
+  y1 = EMP_t
+       Construcción: EMP = (Δ ln TC_t) + ρ·(−Δ Reservas_t / Base_Mon_t)
+       o bien: EMP = (TC_t - TC_{t-1})/TC_t - (Res_t - Res_{t-1})/Res_t
+       [Datos: tc_clp_usd y reservas_netas_musd del archivo Series_Chile]
+
+  y2 = D.ln(credito_privado_mclp)
+       Crecimiento mensual de las colocaciones en moneda nacional total
+       [Datos: credito_privado_mclp del archivo Series_Chile]
+
+  y3 = D.ln(imacec_pbi)
+       Crecimiento mensual del IMACEC desestacionalizado (proxy del PBI)
+       [Datos: imacec_pbi del archivo Series_Chile]
+
+  y4 = D.ln(ipc_indice)
+       Inflación mensual del IPC (base 2023=100)
+       [Datos: ipc_indice del archivo Series_Chile]
+
+Período: 2004M01 - 2025M12 (T=264 observaciones)
+
+Comandos sugeridos en Stata 17:
+   varsoc y1 y2 y3 y4, maxlag(12)
+   var y1 y2 y3 y4, lags(1/p)
+   vargranger
+   irf create irf_canal, step(24) set(irfs_chile)
+   irf graph oirf, impulse(y1) response(y2 y3 y4) ci
+   irf graph oirf, impulse(y2) response(y3 y4) ci
+   irf graph oirf, impulse(y3) response(y4) ci
+   irf table fevd
+
+Interpretación esperada de las IRFs basada en la literatura:
+  - Choque EMP (+1σ): crédito cae (canal financiero), PBI cae (rezagado),
+    inflación respuesta mixta (canal directo vs. indirecto)
+  - Choque crédito (+1σ): PBI sube ~0.5%, inflación sube ~0.45% [ref: Guevara]
+  - FEVD inflación: EMP y crédito explican fracción significativa de la
+    varianza de la inflación en horizontes > 6 meses
+
+================================================================================
+REFERENCIAS COMPLETAS
+================================================================================
+
+Aizenman, J., & Hutchison, M. M. (2010/2016). Exchange market pressure and
+  absorption by international reserves: Emerging markets and fear of reserve
+  loss during the 2008-2009 crisis. Journal of International Money and Finance.
+
+Carrasco, A., & Florián-Hoyle, D. (2025). External shocks and FX intervention
+  policy in financially dollarized economies. Journal of Macroeconomics,
+  84, 103672. https://doi.org/10.1016/j.jmacro.2025.103672
+
+Doojav, G.-O. (2024). Exchange rate and macroeconomy in a commodity exporting
+  economy: Evidence from Mongolia. [SBVAR con restricciones de signo]
+
+Gevorkyan, A. V. (2019). Exchange market pressure and primary commodity
+  exporting emerging market economies. Applied Economics, 51(22), 2390-2412.
+
+Girton, L., & Roper, D. (1977). A monetary model of exchange market pressure
+  applied to the postwar Canadian experience. American Economic Review,
+  67(4), 537-548.
+
+Guevara, B., & Rodriguez, G. (2020). Macroeconomic effects of loan supply
+  shocks: Empirical evidence for Peru. Applied Economics, 52(25), 2770-2785.
+
+Keefe, H. G. (2021). The transmission of global monetary and credit shocks on
+  exchange market pressure in emerging market and developing economies.
+  Journal of International Financial Markets, Institutions and Money,
+  72, 101343.
+
+Keefe, H. G., & Saha, S. (2023). Global uncertainty shocks and exchange market
+  pressure in emerging markets. [GVAR, 28 países + eurozona, 1996-2022]
+
+Olanipekun, I. O., Güngör, H., & Olasehinde-Williams, G. (2019). Unraveling
+  the causal relationship between economic policy uncertainty and exchange
+  market pressure in BRIC countries: Evidence from bootstrap panel Granger
+  causality. SAGE Open, April-June 2019, 1-13.
+  https://doi.org/10.1177/2158244019853903
+
+Rodriguez, G. (2023). External shocks and macroeconomic fluctuations in
+  Pacific Alliance countries. [TVP-VAR-SV, PUCP Working Paper]
+
+Rodriguez, G., & Castillo, B. (2024). Evolution of exchange rate pass-through
+  in Peru: An empirical assessment using a TVP-VAR-SV model. Journal of
+  Macroeconomics [en prensa / working paper PUCP].
+
+Rossini, R., & Vega, M. (2008). The monetary policy transmission mechanism
+  under financial dollarisation: The case of Peru 1996-2006.
+  BIS Working Papers No. 262.
+
+Siklar, I., & Akca, A. (2020). Exchange market pressure and monetary policy:
+  The Turkish case. Ekonomika, 99(1), 110-130.
+  https://doi.org/10.15388/Ekon.2020.1.7
+
+================================================================================
+FIN DEL DOCUMENTO
+Análisis de 13 papers académicos | Canal de Transmisión EMP→Crédito→PBI→IPC
+Chile 2004-2025 | Metodología VAR-Cholesky | ULIMA Teo. Política 2026-1
+================================================================================

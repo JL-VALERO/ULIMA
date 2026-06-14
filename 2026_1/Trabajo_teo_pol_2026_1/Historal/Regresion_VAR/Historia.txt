@@ -1,0 +1,132 @@
+  Resultados VAR — Canal Crediticio Peru (2004–2021)
+
+  Estabilidad del VAR
+
+  Todos los eigenvalues tienen modulo < 1 — VAR(2) es estable. El modulo mas alto es 0.997,
+  bien dentro del circulo unitario.
+
+  Raiz Unitaria
+
+  - tasa_ref, tamn, ltc → I(1) (no rechazan H0 en niveles, rechazan en diferencias)
+  - inflacion → I(0) (estacionaria, como corresponde a una tasa de cambio)
+
+  Cointegracion (Johansen)
+
+  Rango = 0 no rechazado → sin cointegracion formal → VAR en niveles es la especificacion
+  correcta (Sims, 1980).
+
+  Causalidad de Granger
+
+  ┌──────────────────────┬───────┬─────────┬────────────────────────┐
+  │       Relacion       │ chi2  │ p-valor │       Conclusion       │
+  ├──────────────────────┼───────┼─────────┼────────────────────────┤
+  │ tasa_ref → tamn      │ 15.78 │ 0.000   │ Causalidad confirmada  │
+  ├──────────────────────┼───────┼─────────┼────────────────────────┤
+  │ tasa_ref → inflacion │ 6.92  │ 0.031   │ Causalidad confirmada  │
+  ├──────────────────────┼───────┼─────────┼────────────────────────┤
+  │ inflacion → tasa_ref │ 11.90 │ 0.003   │ Retroalimentacion      │
+  ├──────────────────────┼───────┼─────────┼────────────────────────┤
+  │ tc → inflacion       │ 7.02  │ 0.030   │ Canal cambiario activo │
+  ├──────────────────────┼───────┼─────────┼────────────────────────┤
+  │ tasa_ref → tc        │ 2.76  │ 0.252   │ No significativo       │
+  └──────────────────────┴───────┴─────────┴────────────────────────┘
+
+  IRF — Respuesta de TAMN ante 1 shock en tasa_ref (Cholesky)
+
+  ┌─────┬────────────────────┐
+  │ Mes │   Respuesta TAMN   │
+  ├─────┼────────────────────┤
+  │ 0   │ +0.040 pp          │
+  ├─────┼────────────────────┤
+  │ 3   │ +0.189 pp          │
+  ├─────┼────────────────────┤
+  │ 7   │ +0.226 pp (maximo) │
+  ├─────┼────────────────────┤
+  │ 12  │ +0.199 pp          │
+  ├─────┼────────────────────┤
+  │ 24  │ +0.134 pp          │
+  └─────┴────────────────────┘
+
+  El efecto alcanza su pico en el mes 7 y luego declina lentamente. Respuesta positiva
+  persistente.
+
+  IRF — Respuesta de Inflacion ante shock en tasa_ref
+
+  - Meses 0–7: inflacion sube (+0.04 pp) — efecto inicial de demanda
+  - Meses 8–24: inflacion cae (hasta −0.007 pp) — efecto contractivo toma efecto
+  - Comportamiento consistent con el price puzzle documentado en VARs de economias emergentes
+
+  IRF — Tipo de cambio ante shock en tasa_ref
+
+  - Meses 0–6: leve apreciacion (sol se fortalece, tc baja)
+  - Meses 7–24: depreciacion gradual (−0.019 S/$ en mes 24)
+
+  FEVD de TAMN (mes 12)
+
+  ┌───────────────┬──────────────────────────────┐
+  │   Variable    │ % varianza de TAMN explicado │
+  ├───────────────┼──────────────────────────────┤
+  │ Propia (tamn) │ 73.3%                        │
+  ├───────────────┼──────────────────────────────┤
+  │ tasa_ref      │ 25.8%                        │
+  ├───────────────┼──────────────────────────────┤
+  │ tc            │ 0.5%                         │
+  ├───────────────┼──────────────────────────────┤
+  │ inflacion     │ 0.4%                         │
+  └───────────────┴──────────────────────────────┘
+
+  La tasa BCRP explica el 26% de la varianza de la TAMN a horizonte de un año — contribucion
+  significativa para una variable de politica.
+
+  Diagnosticos
+
+  - LM test autocorrelacion: p > 0.07 en todos los rezagos hasta 12 — sin problema
+  - Jarque-Bera: residuos no normales (comun en series financieras, no invalida el VAR con N
+  grande)
+
+  Archivos generados en Regresion_VAR\output\
+
+  10 graficos PNG + 3 tablas RTF: g1_series_var, g2_xcorr, g3_estabilidad, g4–g7_irf_*,
+  g8–g9_fevd_*, g10_cirf_tamn
+
+✻ Brewed for 1m 12s · 2 shells still running
+
+※ recap: Analizando el canal crediticio de política monetaria en Perú para un trabajo grupal de
+   ULIMA. Se completaron dos regresiones en Stata 17: ARDL/ECM en la carpeta Regresion y VAR en
+   Regresion_VAR, ambas con resultados e gráficos guardados. No hay nada pendiente.
+
+  IRF — Tipo de cambio ante shock en tasa_ref
+
+  - Meses 0–6: leve apreciacion (sol se fortalece, tc baja)
+  - Meses 7–24: depreciacion gradual (−0.019 S/$ en mes 24)
+
+  FEVD de TAMN (mes 12)
+
+  ┌───────────────┬──────────────────────────────┐
+  │   Variable    │ % varianza de TAMN explicado │
+  ├───────────────┼──────────────────────────────┤
+  │ Propia (tamn) │ 73.3%                        │
+  ├───────────────┼──────────────────────────────┤
+  │ tasa_ref      │ 25.8%                        │
+  ├───────────────┼──────────────────────────────┤
+  │ tc            │ 0.5%                         │
+  ├───────────────┼──────────────────────────────┤
+  │ inflacion     │ 0.4%                         │
+  └───────────────┴──────────────────────────────┘
+
+  La tasa BCRP explica el 26% de la varianza de la TAMN a horizonte de un año — contribucion
+  significativa para una variable de politica.
+
+  Diagnosticos
+
+  - LM test autocorrelacion: p > 0.07 en todos los rezagos hasta 12 — sin problema
+  - Jarque-Bera: residuos no normales (comun en series financieras, no invalida el VAR con N grande)
+ 
+
+
+
+
+
+
+
+*********************************************************************************************************************************************

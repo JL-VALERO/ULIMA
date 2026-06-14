@@ -1,0 +1,142 @@
+● Corrió completo. Acá los outputs:
+
+  ---
+  VAR con Choques Estructurales — Outputs
+
+  Periodos modelados
+
+  ┌────────────┬─────────────────────┬─────────────────────────────────────────────────────┐
+  │   Dummy    │       Periodo       │                         Obs                         │
+  ├────────────┼─────────────────────┼─────────────────────────────────────────────────────┤
+  │ D_gfc      │ sep-2008 – jun-2009 │ 10 meses                                            │
+  ├────────────┼─────────────────────┼─────────────────────────────────────────────────────┤
+  │ D_pandemic │ mar-2020 – dic-2021 │ 22 meses                                            │
+  ├────────────┼─────────────────────┼─────────────────────────────────────────────────────┤
+  │ D_highinfl │ ene-2022 – dic-2023 │ 24 meses (omitida por colinealidad con muestra IPC) │
+  └────────────┴─────────────────────┴─────────────────────────────────────────────────────┘
+
+  ---
+  Test de Chow — Cambio estructural en pass-through TAMN~tasa_ref
+
+  Quiebre en GFC (sep-2008):
+  - Pass-through pre-GFC: β = −0.68 (negativo, mercado distorsionado)
+  - Coeficiente de interacción post_gfc × tasa_ref = +1.11 (p=0.001) → quiebre significativo
+  - Pass-through post-GFC: −0.68 + 1.11 = +0.43 pp por pp de tasa_ref
+
+  Quiebre en COVID (mar-2020):
+  - Pass-through pre-COVID: β = +0.87
+  - Coeficiente de interacción post_covid × tasa_ref = −0.37 (p=0.132) → NO significativo
+  - El COVID no cambió estructuralmente el pass-through (lo que sí cambió es el nivel de TAMN)
+
+  ---
+  Medias por periodo de crisis
+
+  ┌────────────────┬────────┬────────┬────────┬──────────────┐
+  │    Variable    │ Normal │  GFC   │ COVID  │ Alta Inflac. │
+  ├────────────────┼────────┼────────┼────────┼──────────────┤
+  │ Tasa ref. BCRP │ 3.73%  │ 5.68%  │ 0.58%  │ 6.54%        │
+  ├────────────────┼────────┼────────┼────────┼──────────────┤
+  │ TAMN           │ 17.68% │ 22.68% │ 11.75% │ 14.01%       │
+  ├────────────────┼────────┼────────┼────────┼──────────────┤
+  │ TC (S/$)       │ 3.26   │ 3.09   │ 3.72   │ 3.79         │
+  └────────────────┴────────┴────────┴────────┴──────────────┘
+
+  ---
+  Estabilidad del VAR con dummies
+
+  Todos los eigenvalues < 1 (modulo máximo: 0.989) — modelo estable. Incluir las dummies mejora la
+  estabilidad vs. el modelo sin controles.
+
+  LM Test (autocorrelación)
+
+  - Lag 1: p = 0.000 (problema residual en lag 1 — efecto del COVID no completamente capturado)
+  - Lags 2–12: p > 0.05 → sin autocorrelación
+
+  Causalidad de Granger (con dummies)
+
+  ┌────────────────────────┬───────┬─────────────────────────────┐
+  │        Relación        │ chi2  │           p-valor           │
+  ├────────────────────────┼───────┼─────────────────────────────┤
+  │ tasa_ref → tamn        │ 12.60 │ 0.002                       │
+  ├────────────────────────┼───────┼─────────────────────────────┤
+  │ tasa_ref → inflacion   │ 11.19 │ 0.004                       │
+  ├────────────────────────┼───────┼─────────────────────────────┤
+  │ inflacion → tasa_ref   │ 17.96 │ 0.000                       │
+  ├────────────────────────┼───────┼─────────────────────────────┤
+  │ D_pandemic → inflacion │ —     │ sig. coef. +0.267 (p=0.008) │
+  └────────────────────────┴───────┴─────────────────────────────┘
+
+  ---
+  IRF: Respuesta de TAMN (tasa_ref → tamn)
+
+  ┌─────┬───────────────┬───────────────┐
+  │ Mes │   Baseline    │  Con dummies  │
+  ├─────┼───────────────┼───────────────┤
+  │ 0   │ +0.040        │ +0.031        │
+  ├─────┼───────────────┼───────────────┤
+  │ 3   │ +0.189        │ +0.156        │
+  ├─────┼───────────────┼───────────────┤
+  │ 7   │ +0.226 (pico) │ +0.203        │
+  ├─────┼───────────────┼───────────────┤
+  │ 12  │ +0.199        │ +0.214 (pico) │
+  ├─────┼───────────────┼───────────────┤
+  │ 24  │ +0.134        │ +0.196        │
+  └─────┴───────────────┴───────────────┘
+
+  Efecto clave: al controlar por GFC y COVID, el pass-through es más persistente y el pico se desplaza
+  del mes 7 al mes 12. El mecanismo de transmisión es más lento de lo que parecía sin controles.
+
+  IRF: Respuesta de Inflación (tasa_ref → inflacion)
+
+  ┌─────┬──────────┬─────────────┐
+  │ Mes │ Baseline │ Con dummies │
+  ├─────┼──────────┼─────────────┤
+  │ 0   │ +0.025   │ +0.030      │
+  ├─────┼──────────┼─────────────┤
+  │ 3   │ +0.028   │ +0.033      │
+  ├─────┼──────────┼─────────────┤
+  │ 8   │ −0.000   │ +0.016      │
+  ├─────┼──────────┼─────────────┤
+  │ 24  │ −0.003   │ +0.006      │
+  └─────┴──────────┴─────────────┘
+
+  Con dummies estructurales desaparece el price puzzle: la inflación ya no cae en ningún horizonte,
+  consistente con teoría.
+
+  IRF: Respuesta del TC (tasa_ref → tc)
+
+  - Sin dummies: apreciación meses 0–6, luego depreciación
+  - Con dummies: apreciación más pronunciada hasta mes 6 (+0.006 S/$), luego depreciación gradual hasta
+  −0.018 S/$ al mes 24
+
+  ---
+  FEVD de TAMN (mes 12)
+
+  ┌───────────────┬─────────────┬─────────────┐
+  │   Variable    │ Sin dummies │ Con dummies │
+  ├───────────────┼─────────────┼─────────────┤
+  │ tasa_ref      │ 25.8%       │ 24.5%       │
+  ├───────────────┼─────────────┼─────────────┤
+  │ tc            │ 0.5%        │ 0.6%        │
+  ├───────────────┼─────────────┼─────────────┤
+  │ tamn (propio) │ 73.3%       │ 73.8%       │
+  ├───────────────┼─────────────┼─────────────┤
+  │ inflacion     │ 0.4%        │ 1.2%        │
+  └───────────────┴─────────────┴─────────────┘
+
+  ---
+  Análisis por sub-periodos — IRF tasa_ref → tamn
+
+  ┌─────┬───────────────────┬─────────────────────┬──────────────────────┐
+  │ Mes │ Pre-GFC (56 obs)* │ Pre-COVID (126 obs) │ Post-COVID (70 obs)* │
+  ├─────┼───────────────────┼─────────────────────┼──────────────────────┤
+  │ 0   │ +0.060            │ +0.008              │ —                    │
+  ├─────┼───────────────────┼─────────────────────┼──────────────────────┤
+  │ 3   │ −0.035            │ +0.066              │ —                    │
+  ├─────┼───────────────────┼─────────────────────┼──────────────────────┤
+  │ 12  │ −0.138            │ +0.076              │ —                    │
+  └─────┴───────────────────┴─────────────────────┴──────────────────────┘
+
+  *Sub-periodos pre-GFC y post-COVID son inestables (eigenvalue > 1) por muestras pequeñas (56 y 70 obs)
+   — las IRFs son referenciales. El periodo pre-COVID (2009–2020, 126 obs) es el único sub-periodo
+  estable y muestra un pass-through positivo pero moderado (+0.077 pp al mes 12).

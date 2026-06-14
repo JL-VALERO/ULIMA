@@ -1,0 +1,1541 @@
+
+  ___  ____  ____  ____  ____ ©
+ /__    /   ____/   /   ____/      17.0
+___/   /   /___/   /   /___/       MP—Parallel Edition
+
+ Statistics and Data Science       Copyright 1985-2021 StataCorp LLC
+                                   StataCorp
+                                   4905 Lakeway Drive
+                                   College Station, Texas 77845 USA
+                                   800-STATA-PC        https://www.stata.com
+                                   979-696-4600        stata@stata.com
+
+Stata license: Unlimited-user 64-core network perpetual
+Serial number: 18461036
+  Licensed to: TEAM BTCR
+               TEAM BTCR
+
+Notes:
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. More than 2 billion observations are allowed; see help obs_advice.
+      4. Maximum number of variables is set to 5,000; see help set_maxvar.
+
+. do canal_var_structural.do 
+
+. /* ============================================================
+>    VAR CON CHOQUES ESTRUCTURALES - CANAL CREDITICIO PERU
+>    Shocks evaluados:
+>      D_gfc      : Crisis Financiera Global   (sep-2008 a jun-2009)
+>      D_pandemic : Pandemia COVID-19           (mar-2020 a dic-2021)
+>      D_highinfl : Alta inflacion post-COVID   (ene-2022 a dic-2023)
+>    Teoria y Politica Monetaria | ULIMA 2026-1
+>    Stata 17
+>    ============================================================ */
+. 
+. clear all
+
+. set more off
+
+. set linesize 120
+
+. 
+. cap ssc install estout, replace
+
+. 
+. global ruta  "C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo grupal\Regresion_VAR_Structural"
+
+. global datos "$ruta\datos_var_structural.xlsx"
+
+. global out   "$ruta\output"
+
+. cap mkdir "$out"
+
+. 
+. 
+. /* ----------------------------------------------------------
+>    1. DATOS Y VARIABLES ESTRUCTURALES
+> ---------------------------------------------------------- */
+. 
+. import excel "$datos", sheet("datos") firstrow clear
+(5 vars, 264 obs)
+
+. gen    mes = mofd(fecha)
+
+. format mes %tm
+
+. tsset  mes, monthly
+
+Time variable: mes, 2004m1 to 2025m12
+        Delta: 1 month
+
+. drop   fecha
+
+. destring tasa_ref tamn ipc tc, replace force
+tasa_ref already numeric; no replace
+tamn already numeric; no replace
+ipc already numeric; no replace
+tc already numeric; no replace
+
+. 
+. gen inflacion = (ipc / L.ipc - 1) * 100
+(49 missing values generated)
+
+. label var tasa_ref  "Tasa ref. BCRP (%)"
+
+. label var tamn      "TAMN (%)"
+
+. label var inflacion "Inflacion mensual (%)"
+
+. label var tc        "Tipo de cambio (S/$)"
+
+. 
+. * Dummies de choques estructurales
+. gen D_gfc      = (mes >= tm(2008m9)  & mes <= tm(2009m6))
+
+. gen D_pandemic = (mes >= tm(2020m3)  & mes <= tm(2021m12))
+
+. gen D_highinfl = (mes >= tm(2022m1)  & mes <= tm(2023m12))
+
+. 
+. label var D_gfc      "Crisis Financiera Global 2008-2009"
+
+. label var D_pandemic "Pandemia COVID-19 2020-2021"
+
+. label var D_highinfl "Alta inflacion post-COVID 2022-2023"
+
+. 
+. display "Obs: " _N
+Obs: 264
+
+. display "Periodos de quiebre estructural:"
+Periodos de quiebre estructural:
+
+. tabulate D_gfc
+
+     Crisis |
+ Financiera |
+     Global |
+  2008-2009 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        254       96.21       96.21
+          1 |         10        3.79      100.00
+------------+-----------------------------------
+      Total |        264      100.00
+
+. tabulate D_pandemic
+
+   Pandemia |
+   COVID-19 |
+  2020-2021 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        242       91.67       91.67
+          1 |         22        8.33      100.00
+------------+-----------------------------------
+      Total |        264      100.00
+
+. tabulate D_highinfl
+
+       Alta |
+  inflacion |
+ post-COVID |
+  2022-2023 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        240       90.91       90.91
+          1 |         24        9.09      100.00
+------------+-----------------------------------
+      Total |        264      100.00
+
+. 
+. 
+. /* ----------------------------------------------------------
+>    2. GRAFICO: SERIES CON SOMBREADO DE CHOQUES
+> ---------------------------------------------------------- */
+. 
+. * Crear variable para zona GFC y pandemia (para sombreado)
+. twoway (rarea D_gfc D_gfc mes, bcolor(red%15) lwidth(none))          ///
+>        (rarea D_pandemic D_pandemic mes, bcolor(blue%15) lwidth(none)) ///
+>        (rarea D_highinfl D_highinfl mes, bcolor(orange%15) lwidth(none)) ///
+>        (line tasa_ref mes, lcolor(cranberry) lwidth(medthick))        ///
+>        (line tamn     mes, lcolor(navy)      lwidth(medthick)),       ///
+>     title("Tasa BCRP y TAMN con choques estructurales")              ///
+>     ytitle("Tasa (%)") xtitle("")                                     ///
+>     legend(label(1 "GFC 2008-09") label(2 "COVID 2020-21")           ///
+>            label(3 "Inf. alta 2022-23") label(4 "Tasa BCRP")        ///
+>            label(5 "TAMN") rows(2)) scheme(s1color)
+
+. graph export "$out\g1_series_choques.png", replace width(1400)
+file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo
+    grupal\Regresion_VAR_Structural\output\g1_series_choques.png saved as PNG format
+
+. 
+. twoway (rarea D_gfc D_gfc mes, bcolor(red%15) lwidth(none))             ///
+>        (rarea D_pandemic D_pandemic mes, bcolor(blue%15) lwidth(none))   ///
+>        (rarea D_highinfl D_highinfl mes, bcolor(orange%15) lwidth(none)) ///
+>        (line inflacion mes, lcolor(forest_green) lwidth(medthick))       ///
+>        (line tc        mes, lcolor(dkorange)     lwidth(medthick)),      ///
+>     title("Inflacion y Tipo de cambio con choques estructurales")        ///
+>     ytitle("") xtitle("")                                                ///
+>     legend(label(1 "GFC") label(2 "COVID") label(3 "Inf. alta")        ///
+>            label(4 "Inflacion mensual %") label(5 "Tipo de cambio S/$") rows(2)) ///
+>     scheme(s1color)
+
+. graph export "$out\g2_inf_tc_choques.png", replace width(1400)
+file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo
+    grupal\Regresion_VAR_Structural\output\g2_inf_tc_choques.png saved as PNG format
+
+. 
+. display "Graficos de series guardados."
+Graficos de series guardados.
+
+. 
+. 
+. /* ----------------------------------------------------------
+>    3. PRUEBA DE QUIEBRE ESTRUCTURAL (Chow) EN ECUACIONES OLS
+>    H0: sin quiebre en la fecha especificada
+>    Rechazar H0 -> hay cambio estructural
+> ---------------------------------------------------------- */
+. 
+. display _newline "=== TESTS DE QUIEBRE ESTRUCTURAL (CHOW) ==="
+
+=== TESTS DE QUIEBRE ESTRUCTURAL (CHOW) ===
+
+. 
+. * Quiebre en GFC (sep-2008)
+. display _newline "--- Chow: TAMN ~ tasa_ref  |  Quiebre = sep-2008 ---"
+
+--- Chow: TAMN ~ tasa_ref  |  Quiebre = sep-2008 ---
+
+. gen post_gfc = (mes >= tm(2008m9))
+
+. reg tamn tasa_ref post_gfc c.tasa_ref#c.post_gfc
+
+      Source |       SS           df       MS      Number of obs   =       264
+-------------+----------------------------------   F(3, 260)       =    167.35
+       Model |  2968.78816         3  989.596054   Prob > F        =    0.0000
+    Residual |  1537.50681       260  5.91348774   R-squared       =    0.6588
+-------------+----------------------------------   Adj R-squared   =    0.6549
+       Total |  4506.29497       263  17.1342014   Root MSE        =    2.4318
+
+---------------------------------------------------------------------------------------
+                 tamn | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+----------------------+----------------------------------------------------------------
+             tasa_ref |  -.6835439   .3049509    -2.24   0.026    -1.284032    -.083056
+             post_gfc |  -12.28813   1.304888    -9.42   0.000    -14.85763   -9.718641
+                      |
+c.tasa_ref#c.post_gfc |   1.110147   .3185568     3.48   0.001     .4828673    1.737427
+                      |
+                _cons |   26.86044   1.246567    21.55   0.000     24.40579     29.3151
+---------------------------------------------------------------------------------------
+
+. display "Coef. interaccion = cambio en pass-through durante/post GFC"
+Coef. interaccion = cambio en pass-through durante/post GFC
+
+. 
+. * Quiebre en pandemia (mar-2020)
+. display _newline "--- Chow: TAMN ~ tasa_ref  |  Quiebre = mar-2020 ---"
+
+--- Chow: TAMN ~ tasa_ref  |  Quiebre = mar-2020 ---
+
+. gen post_covid = (mes >= tm(2020m3))
+
+. reg tamn tasa_ref post_covid c.tasa_ref#c.post_covid
+
+      Source |       SS           df       MS      Number of obs   =       264
+-------------+----------------------------------   F(3, 260)       =     66.01
+       Model |  1948.38414         3  649.461381   Prob > F        =    0.0000
+    Residual |  2557.91083       260  9.83811858   R-squared       =    0.4324
+-------------+----------------------------------   Adj R-squared   =    0.4258
+       Total |  4506.29497       263  17.1342014   Root MSE        =    3.1366
+
+-----------------------------------------------------------------------------------------
+                   tamn | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+------------------------+----------------------------------------------------------------
+               tasa_ref |   .8700092    .203169     4.28   0.000     .4699431    1.270075
+             post_covid |  -4.532429   1.040713    -4.36   0.000    -6.581728   -2.483131
+                        |
+c.tasa_ref#c.post_covid |  -.3714884   .2460335    -1.51   0.132    -.8559603    .1129834
+                        |
+                  _cons |    16.1751   .7794156    20.75   0.000     14.64033    17.70987
+-----------------------------------------------------------------------------------------
+
+. display "Coef. interaccion = cambio en pass-through durante/post COVID"
+Coef. interaccion = cambio en pass-through durante/post COVID
+
+. 
+. * Diferencias en medias de las variables durante cada shock
+. display _newline "--- Estadisticas por periodo ---"
+
+--- Estadisticas por periodo ---
+
+. tabstat tasa_ref tamn inflacion tc, by(D_gfc)      stat(mean sd) col(stat) nototal
+
+Summary for variables: tasa_ref tamn inflacion tc
+Group variable: D_gfc (Crisis Financiera Global 2008-2009)
+
+   D_gfc |      Mean        SD
+---------+--------------------
+       0 |  3.731299  1.676946
+         |  17.68354  4.099689
+         |  .2472699  .2981686
+         |  3.259035  .3787979
+---------+--------------------
+       1 |     5.675  1.258582
+         |  22.67865  1.244948
+         |  .1877218  .3045159
+         |  3.089922  .0865373
+------------------------------
+
+. tabstat tasa_ref tamn inflacion tc, by(D_pandemic)  stat(mean sd) col(stat) nototal
+
+Summary for variables: tasa_ref tamn inflacion tc
+Group variable: D_pandemic (Pandemia COVID-19 2020-2021)
+
+D_pandemic |      Mean        SD
+-----------+--------------------
+         0 |   4.09814  1.445384
+           |  18.42958  3.856529
+           |  .2308181  .2856312
+           |  3.210158  .3545809
+-----------+--------------------
+         1 |  .5795455   .651858
+           |  11.74757  1.012268
+           |  .3645297  .3771734
+           |  3.719812  .2295338
+--------------------------------
+
+. tabstat tasa_ref tamn inflacion tc, by(D_highinfl)  stat(mean sd) col(stat) nototal
+
+Summary for variables: tasa_ref tamn inflacion tc
+Group variable: D_highinfl (Alta inflacion post-COVID 2022-2023)
+
+D_highinfl |      Mean        SD
+-----------+--------------------
+         0 |   3.53125  1.465275
+           |  18.25899  4.116299
+           |  .2445002  .2980066
+           |  3.198747  .3471084
+-----------+--------------------
+         1 |  6.541667  1.492129
+           |  14.01035  1.653211
+           |         .         .
+           |   3.79145    .08959
+--------------------------------
+
+. 
+. 
+. /* ----------------------------------------------------------
+>    4. VAR BASELINE (sin dummies - referencia)
+>    Mismo modelo que Regresion_VAR para comparacion
+> ---------------------------------------------------------- */
+. 
+. display _newline "=== VAR BASELINE (sin dummies de choque) ==="
+
+=== VAR BASELINE (sin dummies de choque) ===
+
+. 
+. var tasa_ref tc tamn inflacion, lags(1/2)
+
+Vector autoregression
+
+Sample: 2004m4 thru 2021m12                     Number of obs     =        213
+Log likelihood =   430.5541                     AIC               =  -3.704734
+FPE            =   2.89e-07                     HQIC              =  -3.475143
+Det(Sigma_ml)  =   2.06e-07                     SBIC              =  -3.136628
+
+Equation           Parms      RMSE     R-sq      chi2     P>chi2
+----------------------------------------------------------------
+tasa_ref              9     .158349   0.9882   17862.11   0.0000
+tc                    9     .038509   0.9865   15508.68   0.0000
+tamn                  9     .293966   0.9952   44618.53   0.0000
+inflacion             9     .281247   0.1156    27.8307   0.0005
+----------------------------------------------------------------
+
+------------------------------------------------------------------------------
+             | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+tasa_ref     |
+    tasa_ref |
+         L1. |   1.633996   .0522358    31.28   0.000     1.531615    1.736376
+         L2. |  -.6701704   .0517141   -12.96   0.000    -.7715281   -.5688126
+             |
+          tc |
+         L1. |  -.0316146   .2717283    -0.12   0.907    -.5641923    .5009632
+         L2. |  -.0035962   .2738285    -0.01   0.990    -.5402903    .5330978
+             |
+        tamn |
+         L1. |   -.013365   .0356839    -0.37   0.708    -.0833043    .0565742
+         L2. |   .0186046   .0357216     0.52   0.602    -.0514085    .0886177
+             |
+   inflacion |
+         L1. |    .085581   .0386351     2.22   0.027     .0098577    .1613044
+         L2. |   .0841605    .038358     2.19   0.028     .0089801    .1593409
+             |
+       _cons |   .0948138   .1467734     0.65   0.518    -.1928567    .3824843
+-------------+----------------------------------------------------------------
+tc           |
+    tasa_ref |
+         L1. |   .0173784   .0127031     1.37   0.171    -.0075193    .0422761
+         L2. |  -.0191237   .0125763    -1.52   0.128    -.0437728    .0055253
+             |
+          tc |
+         L1. |   1.255136   .0660812    18.99   0.000     1.125619    1.384653
+         L2. |  -.2646728   .0665919    -3.97   0.000    -.3951906   -.1341551
+             |
+        tamn |
+         L1. |  -.0062772   .0086779    -0.72   0.469    -.0232857    .0107312
+         L2. |   .0045842   .0086871     0.53   0.598    -.0124422    .0216106
+             |
+   inflacion |
+         L1. |  -.0208233   .0093956    -2.22   0.027    -.0392384   -.0024083
+         L2. |   .0170867   .0093282     1.83   0.067    -.0011963    .0353697
+             |
+       _cons |    .069894   .0356936     1.96   0.050    -.0000642    .1398521
+-------------+----------------------------------------------------------------
+tamn         |
+    tasa_ref |
+         L1. |   .3844728   .0969729     3.96   0.000     .1944094    .5745361
+         L2. |  -.3695149   .0960043    -3.85   0.000    -.5576799   -.1813499
+             |
+          tc |
+         L1. |  -.4888458   .5044485    -0.97   0.333    -1.477547    .4998551
+         L2. |   .4976937   .5083474     0.98   0.328    -.4986488    1.494036
+             |
+        tamn |
+         L1. |   1.155626   .0662452    17.44   0.000     1.025788    1.285464
+         L2. |  -.1612654   .0663152    -2.43   0.015    -.2912408   -.0312899
+             |
+   inflacion |
+         L1. |   .0946171   .0717239     1.32   0.187    -.0459591    .2351933
+         L2. |  -.1764842   .0712096    -2.48   0.013    -.3160524   -.0369161
+             |
+       _cons |  -.0046414   .2724765    -0.02   0.986    -.5386856    .5294028
+-------------+----------------------------------------------------------------
+inflacion    |
+    tasa_ref |
+         L1. |   .2392806   .0927771     2.58   0.010     .0574408    .4211205
+         L2. |  -.2236263   .0918505    -2.43   0.015    -.4036499   -.0436027
+             |
+          tc |
+         L1. |   .9364198   .4826224     1.94   0.052    -.0095028    1.882342
+         L2. |  -.9377151   .4863526    -1.93   0.054    -1.890949    .0155185
+             |
+        tamn |
+         L1. |   .0400721    .063379     0.63   0.527    -.0841484    .1642927
+         L2. |  -.0471966   .0634459    -0.74   0.457    -.1715484    .0771551
+             |
+   inflacion |
+         L1. |   .1562523   .0686206     2.28   0.023     .0217584    .2907461
+         L2. |    .015718   .0681285     0.23   0.818    -.1178114    .1492475
+             |
+       _cons |   .2833609   .2606873     1.09   0.277    -.2275767    .7942985
+------------------------------------------------------------------------------
+
+. estimates store var_base
+
+. 
+. varstable
+
+   Eigenvalue stability condition
+  +----------------------------------------+
+  |        Eigenvalue        |   Modulus   |
+  |--------------------------+-------------|
+  |   .9972539               |   .997254   |
+  |   .9913867               |   .991387   |
+  |   .8568518 + .09721785i  |   .862349   |
+  |   .8568518 - .09721785i  |   .862349   |
+  |   .3100836               |   .310084   |
+  |   .1109941 +   .223654i  |   .249681   |
+  |   .1109941 -   .223654i  |   .249681   |
+  |  -.0334058               |   .033406   |
+  +----------------------------------------+
+   All the eigenvalues lie inside the unit circle.
+   VAR satisfies stability condition.
+
+. display _newline "Estabilidad VAR baseline (arriba)"
+
+Estabilidad VAR baseline (arriba)
+
+. 
+. irf create irf_base, step(24) set("$out\irf_base") replace
+(file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo grupal\Regresion_VAR_Structural\output\irf_base.irf no
+> w active)
+(file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo grupal\Regresion_VAR_Structural\output\irf_base.irf up
+> dated)
+
+. 
+. irf table oirf, impulse(tasa_ref) response(tamn) noci
+
+Results from irf_base
+
+---------------------
+         |      (1)  
+    Step |     oirf  
+---------+-----------
+       0 |  .040326
+       1 |  .108751
+       2 |  .158514
+       3 |  .189185
+       4 |  .207962
+       5 |  .219089
+       6 |   .22462
+       7 |  .225877
+       8 |  .223921
+       9 |  .219631
+      10 |  .213728
+      11 |  .206795
+      12 |  .199295
+      13 |   .19159
+      14 |  .183955
+      15 |  .176592
+      16 |  .169643
+      17 |  .163202
+      18 |  .157323
+      19 |   .15203
+      20 |  .147322
+      21 |  .143183
+      22 |  .139581
+      23 |  .136479
+      24 |  .133832
+---------------------
+(1) irfname = irf_base, impulse = tasa_ref, and response = tamn.
+
+. display "(IRF baseline: tasa_ref -> tamn)"
+(IRF baseline: tasa_ref -> tamn)
+
+. 
+. 
+. /* ----------------------------------------------------------
+>    5. VAR CON DUMMIES DE CHOQUE ESTRUCTURAL (modelo principal)
+>    Los dummies entran como variables exogenas
+>    Capturan desplazamientos del intercepto durante cada shock
+> ---------------------------------------------------------- */
+. 
+. display _newline "=== VAR CON DUMMIES DE CHOQUE ESTRUCTURAL ==="
+
+=== VAR CON DUMMIES DE CHOQUE ESTRUCTURAL ===
+
+. 
+. var tasa_ref tc tamn inflacion, lags(1/2) ///
+>     exog(D_gfc D_pandemic D_highinfl)
+note: D_highinfl omitted because of collinearity.
+
+Vector autoregression
+
+Sample: 2004m4 thru 2021m12                     Number of obs     =        213
+Log likelihood =   445.9755                     AIC               =  -3.774418
+FPE            =   2.70e-07                     HQIC              =  -3.493807
+Det(Sigma_ml)  =   1.78e-07                     SBIC              =  -3.080067
+
+Equation           Parms      RMSE     R-sq      chi2     P>chi2
+----------------------------------------------------------------
+tasa_ref             11     .153435   0.9890   19229.05   0.0000
+tc                   11      .03823   0.9868   15896.25   0.0000
+tamn                 11     .292474   0.9953   45525.57   0.0000
+inflacion            11     .277979   0.1445   35.96699   0.0001
+----------------------------------------------------------------
+
+------------------------------------------------------------------------------
+             | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+tasa_ref     |
+    tasa_ref |
+         L1. |   1.591522   .0514658    30.92   0.000     1.490651    1.692394
+         L2. |   -.621512   .0518282   -11.99   0.000    -.7230933   -.5199306
+             |
+          tc |
+         L1. |   .2081161   .2690737     0.77   0.439    -.3192587    .7354909
+         L2. |  -.1883861   .2680504    -0.70   0.482    -.7137552     .336983
+             |
+        tamn |
+         L1. |  -.0422012   .0351506    -1.20   0.230    -.1110951    .0266928
+         L2. |   .0470634    .035188     1.34   0.181    -.0219038    .1160307
+             |
+   inflacion |
+         L1. |   .0976699   .0376704     2.59   0.010     .0238372    .1715026
+         L2. |   .1100247   .0377005     2.92   0.004     .0361331    .1839163
+             |
+       D_gfc |  -.1904692   .0602885    -3.16   0.002    -.3086324    -.072306
+  D_pandemic |  -.0924711   .0554392    -1.67   0.095    -.2011299    .0161878
+       _cons |  -.0845282   .1490934    -0.57   0.571    -.3767459    .2076895
+-------------+----------------------------------------------------------------
+tc           |
+    tasa_ref |
+         L1. |   .0232503   .0128234     1.81   0.070    -.0018831    .0483838
+         L2. |  -.0248718   .0129137    -1.93   0.054    -.0501822    .0004386
+             |
+          tc |
+         L1. |   1.220149   .0670434    18.20   0.000     1.088746    1.351551
+         L2. |  -.2385102   .0667885    -3.57   0.000    -.3694132   -.1076072
+             |
+        tamn |
+         L1. |  -.0023387   .0087583    -0.27   0.789    -.0195046    .0148272
+         L2. |   .0008201   .0087676     0.09   0.925    -.0163641    .0180042
+             |
+   inflacion |
+         L1. |  -.0231299   .0093861    -2.46   0.014    -.0415263   -.0047335
+         L2. |   .0130465   .0093936     1.39   0.165    -.0053646    .0314576
+             |
+       D_gfc |   .0213257   .0150217     1.42   0.156    -.0081163    .0507677
+  D_pandemic |    .019573   .0138135     1.42   0.156    -.0075009    .0466469
+       _cons |    .092763   .0371487     2.50   0.013     .0199529    .1655731
+-------------+----------------------------------------------------------------
+tamn         |
+    tasa_ref |
+         L1. |   .3426043   .0981029     3.49   0.000     .1503262    .5348825
+         L2. |  -.3209971   .0987936    -3.25   0.001    -.5146289   -.1273652
+             |
+          tc |
+         L1. |  -.2535699   .5129017    -0.49   0.621    -1.258839    .7516989
+         L2. |   .3158827   .5109511     0.62   0.536     -.685563    1.317328
+             |
+        tamn |
+         L1. |   1.127174   .0670032    16.82   0.000     .9958496    1.258497
+         L2. |  -.1331157   .0670746    -1.98   0.047    -.2645794    -.001652
+             |
+   inflacion |
+         L1. |   .1061754   .0718064     1.48   0.139    -.0345626    .2469134
+         L2. |  -.1512504   .0718637    -2.10   0.035    -.2921008   -.0104001
+             |
+       D_gfc |  -.1905816   .1149204    -1.66   0.097    -.4158214    .0346582
+  D_pandemic |  -.0873237   .1056769    -0.83   0.409    -.2944466    .1197992
+       _cons |  -.1825155   .2841982    -0.64   0.521    -.7395337    .3745027
+-------------+----------------------------------------------------------------
+inflacion    |
+    tasa_ref |
+         L1. |   .2539161    .093241     2.72   0.006     .0711671    .4366652
+         L2. |  -.2065153   .0938975    -2.20   0.028     -.390551   -.0224796
+             |
+          tc |
+         L1. |   .7899764   .4874829     1.62   0.105    -.1654724    1.745425
+         L2. |  -.8527421   .4856289    -1.76   0.079    -1.804557    .0990731
+             |
+        tamn |
+         L1. |   .0483459   .0636826     0.76   0.448    -.0764698    .1731615
+         L2. |  -.0511095   .0637504    -0.80   0.423     -.176058     .073839
+             |
+   inflacion |
+         L1. |   .1301028   .0682478     1.91   0.057    -.0036604     .263866
+         L2. |  -.0092676   .0683022    -0.14   0.892    -.1431375    .1246024
+             |
+       D_gfc |   -.107623   .1092251    -0.99   0.324    -.3217002    .1064542
+  D_pandemic |   .2667933   .1004396     2.66   0.008     .0699352    .4636514
+       _cons |   .2785466   .2701136     1.03   0.302    -.2508665    .8079596
+------------------------------------------------------------------------------
+
+. 
+. estimates store var_structural
+
+. 
+. display _newline "--- Estabilidad del VAR estructural ---"
+
+--- Estabilidad del VAR estructural ---
+
+. varstable
+
+   Eigenvalue stability condition
+  +----------------------------------------+
+  |        Eigenvalue        |   Modulus   |
+  |--------------------------+-------------|
+  |   .9891385 + .00965847i  |   .989186   |
+  |   .9891385 - .00965847i  |   .989186   |
+  |   .9224176               |   .922418   |
+  |   .7584493               |   .758449   |
+  |   .1033328 +  .2612225i  |   .280918   |
+  |   .1033328 -  .2612225i  |   .280918   |
+  |   .2049975               |   .204997   |
+  | -.00185954               |    .00186   |
+  +----------------------------------------+
+   All the eigenvalues lie inside the unit circle.
+   VAR satisfies stability condition.
+
+. varstable, graph
+
+   Eigenvalue stability condition
+  +----------------------------------------+
+  |        Eigenvalue        |   Modulus   |
+  |--------------------------+-------------|
+  |   .9891385 + .00965847i  |   .989186   |
+  |   .9891385 - .00965847i  |   .989186   |
+  |   .9224176               |   .922418   |
+  |   .7584493               |   .758449   |
+  |   .1033328 +  .2612225i  |   .280918   |
+  |   .1033328 -  .2612225i  |   .280918   |
+  |   .2049975               |   .204997   |
+  | -.00185954               |    .00186   |
+  +----------------------------------------+
+   All the eigenvalues lie inside the unit circle.
+   VAR satisfies stability condition.
+
+. graph export "$out\g3_estabilidad_structural.png", replace width(800)
+file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo
+    grupal\Regresion_VAR_Structural\output\g3_estabilidad_structural.png saved as PNG format
+
+. 
+. display _newline "--- Diagnosticos de residuos ---"
+
+--- Diagnosticos de residuos ---
+
+. varlmar, mlag(12)
+
+   Lagrange-multiplier test
+  +--------------------------------------+
+  | lag  |      chi2    df   Prob > chi2 |
+  |------+-------------------------------|
+  |   1  |   79.0502    16     0.00000   |
+  |   2  |   25.9916    16     0.05415   |
+  |   3  |   25.9437    16     0.05483   |
+  |   4  |   19.4324    16     0.24688   |
+  |   5  |    9.7424    16     0.87973   |
+  |   6  |   14.4713    16     0.56365   |
+  |   7  |   11.8082    16     0.75707   |
+  |   8  |   15.9125    16     0.45909   |
+  |   9  |   16.3957    16     0.42570   |
+  |  10  |   22.5751    16     0.12557   |
+  |  11  |   18.2097    16     0.31176   |
+  |  12  |   21.4730    16     0.16104   |
+  +--------------------------------------+
+   H0: no autocorrelation at lag order
+
+. varnorm
+
+   Jarque-Bera test
+  +--------------------------------------------------------+
+  |           Equation |            chi2   df  Prob > chi2 |
+  |--------------------+-----------------------------------|
+  |           tasa_ref |          621.073   2    0.00000   |
+  |                 tc |           27.018   2    0.00000   |
+  |               tamn |           41.618   2    0.00000   |
+  |          inflacion |           17.943   2    0.00013   |
+  |                ALL |          707.651   8    0.00000   |
+  +--------------------------------------------------------+
+
+   Skewness test
+  +--------------------------------------------------------+
+  |           Equation | Skewness   chi2   df  Prob > chi2 |
+  |--------------------+-----------------------------------|
+  |           tasa_ref | -1.1252   44.945   1    0.00000   |
+  |                 tc |  .02314    0.019   1    0.89034   |
+  |               tamn |  .10643    0.402   1    0.52599   |
+  |          inflacion |  .28158    2.815   1    0.09341   |
+  |                ALL |           48.181   4    0.00000   |
+  +--------------------------------------------------------+
+
+   Kurtosis test
+  +--------------------------------------------------------+
+  |           Equation | Kurtosis   chi2   df  Prob > chi2 |
+  |--------------------+-----------------------------------|
+  |           tasa_ref |  11.057  576.127   1    0.00000   |
+  |                 tc |  4.7442   26.999   1    0.00000   |
+  |               tamn |   5.155   41.216   1    0.00000   |
+  |          inflacion |  4.3056   15.128   1    0.00010   |
+  |                ALL |          659.470   4    0.00000   |
+  +--------------------------------------------------------+
+
+. 
+. display _newline "--- Causalidad de Granger (VAR con dummies) ---"
+
+--- Causalidad de Granger (VAR con dummies) ---
+
+. vargranger
+
+   Granger causality Wald tests
+  +------------------------------------------------------------------+
+  |          Equation           Excluded |   chi2     df Prob > chi2 |
+  |--------------------------------------+---------------------------|
+  |          tasa_ref                 tc |  .76245     2    0.683    |
+  |          tasa_ref               tamn |  3.9643     2    0.138    |
+  |          tasa_ref          inflacion |  17.964     2    0.000    |
+  |          tasa_ref                ALL |  20.333     6    0.002    |
+  |--------------------------------------+---------------------------|
+  |                tc           tasa_ref |  3.7777     2    0.151    |
+  |                tc               tamn |  3.8075     2    0.149    |
+  |                tc          inflacion |  7.1236     2    0.028    |
+  |                tc                ALL |  14.475     6    0.025    |
+  |--------------------------------------+---------------------------|
+  |              tamn           tasa_ref |  12.605     2    0.002    |
+  |              tamn                 tc |   .9701     2    0.616    |
+  |              tamn          inflacion |   5.802     2    0.055    |
+  |              tamn                ALL |  18.848     6    0.004    |
+  |--------------------------------------+---------------------------|
+  |         inflacion           tasa_ref |  11.185     2    0.004    |
+  |         inflacion                 tc |  3.6547     2    0.161    |
+  |         inflacion               tamn |  .83729     2    0.658    |
+  |         inflacion                ALL |  18.656     6    0.005    |
+  +------------------------------------------------------------------+
+
+. 
+. 
+. /* ----------------------------------------------------------
+>    6. IRF COMPARACION: baseline vs estructural
+>    Misma metodologia, diferente especificacion
+> ---------------------------------------------------------- */
+. 
+. display _newline "=== IRF: VAR CON DUMMIES (modelo principal) ==="
+
+=== IRF: VAR CON DUMMIES (modelo principal) ===
+
+. 
+. irf create irf_struct, step(24) set("$out\irf_structural") replace
+(file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo grupal\Regresion_VAR_Structural\output\irf_structural.
+> irf now active)
+(file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo grupal\Regresion_VAR_Structural\output\irf_structural.
+> irf updated)
+
+. 
+. * IRF tasa_ref -> tamn
+. irf graph oirf, impulse(tasa_ref) response(tamn) ///
+>     yline(0, lpattern(dash) lcolor(gs10)) ///
+>     title("IRF: TAMN ante shock en Tasa Ref. (VAR con dummies estructurales)") ///
+>     ytitle("Puntos porcentuales") xtitle("Meses") scheme(s1color)
+
+. graph export "$out\g4_irf_tamn_structural.png", replace width(1200)
+file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo
+    grupal\Regresion_VAR_Structural\output\g4_irf_tamn_structural.png saved as PNG format
+
+. 
+. * IRF tasa_ref -> inflacion
+. irf graph oirf, impulse(tasa_ref) response(inflacion) ///
+>     yline(0, lpattern(dash) lcolor(gs10)) ///
+>     title("IRF: Inflacion ante shock en Tasa Ref. (VAR con dummies)") ///
+>     ytitle("Puntos porcentuales") xtitle("Meses") scheme(s1color)
+
+. graph export "$out\g5_irf_inf_structural.png", replace width(1200)
+file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo
+    grupal\Regresion_VAR_Structural\output\g5_irf_inf_structural.png saved as PNG format
+
+. 
+. * IRF tasa_ref -> tc
+. irf graph oirf, impulse(tasa_ref) response(tc) ///
+>     yline(0, lpattern(dash) lcolor(gs10)) ///
+>     title("IRF: Tipo de Cambio ante shock en Tasa Ref. (VAR con dummies)") ///
+>     ytitle("S/$") xtitle("Meses") scheme(s1color)
+
+. graph export "$out\g6_irf_tc_structural.png", replace width(1200)
+file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo
+    grupal\Regresion_VAR_Structural\output\g6_irf_tc_structural.png saved as PNG format
+
+. 
+. * IRF combinada 3 canales
+. irf graph oirf, impulse(tasa_ref) response(tc tamn inflacion) ///
+>     yline(0, lpattern(dash) lcolor(gs10)) ///
+>     title("Canales de transmision (VAR con dummies de choques)") ///
+>     xtitle("Meses") scheme(s1color)
+
+. graph export "$out\g7_irf_combinada_structural.png", replace width(1400)
+file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo
+    grupal\Regresion_VAR_Structural\output\g7_irf_combinada_structural.png saved as PNG format
+
+. 
+. * Tablas numericas IRF estructural
+. display _newline "=== TABLA IRF: tasa_ref -> tamn (VAR estructural) ==="
+
+=== TABLA IRF: tasa_ref -> tamn (VAR estructural) ===
+
+. irf table oirf, impulse(tasa_ref) response(tamn) noci
+
+Results from irf_struct
+
+---------------------
+         |      (1)  
+    Step |     oirf  
+---------+-----------
+       0 |  .030684
+       1 |  .088687
+       2 |  .129494
+       3 |  .155592
+       4 |  .173506
+       5 |  .186578
+       6 |  .196143
+       7 |  .202986
+       8 |  .207733
+       9 |   .21088
+      10 |  .212802
+      11 |  .213787
+      12 |  .214051
+      13 |  .213761
+      14 |  .213042
+      15 |  .211993
+      16 |  .210687
+      17 |  .209181
+      18 |  .207519
+      19 |  .205734
+      20 |  .203854
+      21 |  .201899
+      22 |  .199884
+      23 |  .197822
+      24 |  .195723
+---------------------
+(1) irfname = irf_struct, impulse = tasa_ref, and response = tamn.
+
+. 
+. display _newline "=== TABLA IRF: tasa_ref -> inflacion (VAR estructural) ==="
+
+=== TABLA IRF: tasa_ref -> inflacion (VAR estructural) ===
+
+. irf table oirf, impulse(tasa_ref) response(inflacion) noci
+
+Results from irf_struct
+
+---------------------
+         |      (1)  
+    Step |     oirf  
+---------+-----------
+       0 |  .030336
+       1 |  .044343
+       2 |  .040491
+       3 |  .032962
+       4 |  .027338
+       5 |  .023336
+       6 |  .020239
+       7 |  .017752
+       8 |  .015747
+       9 |  .014124
+      10 |    .0128
+      11 |  .011708
+      12 |  .010799
+      13 |  .010034
+      14 |  .009385
+      15 |  .008828
+      16 |  .008345
+      17 |  .007923
+      18 |  .007552
+      19 |  .007222
+      20 |  .006926
+      21 |  .006661
+      22 |   .00642
+      23 |  .006201
+      24 |  .006001
+---------------------
+(1) irfname = irf_struct, impulse = tasa_ref, and response = inflacion.
+
+. 
+. display _newline "=== TABLA IRF: tasa_ref -> tc (VAR estructural) ==="
+
+=== TABLA IRF: tasa_ref -> tc (VAR estructural) ===
+
+. irf table oirf, impulse(tasa_ref) response(tc) noci
+
+Results from irf_struct
+
+---------------------
+         |      (1)  
+    Step |     oirf  
+---------+-----------
+       0 |  .001231
+       1 |  .004202
+       2 |  .005879
+       3 |  .006472
+       4 |  .006299
+       5 |  .005555
+       6 |  .004409
+       7 |  .003001
+       8 |  .001438
+       9 | -.000202
+      10 | -.001863
+      11 | -.003506
+      12 | -.005103
+      13 | -.006637
+      14 | -.008095
+      15 | -.009471
+      16 | -.010762
+      17 | -.011967
+      18 | -.013086
+      19 | -.014122
+      20 | -.015078
+      21 | -.015958
+      22 | -.016766
+      23 | -.017505
+      24 |  -.01818
+---------------------
+(1) irfname = irf_struct, impulse = tasa_ref, and response = tc.
+
+. 
+. 
+. /* ----------------------------------------------------------
+>    7. FEVD CON DUMMIES ESTRUCTURALES
+> ---------------------------------------------------------- */
+. 
+. display _newline "=== FEVD (VAR con dummies) ==="
+
+=== FEVD (VAR con dummies) ===
+
+. 
+. display "--- FEVD de TAMN ---"
+--- FEVD de TAMN ---
+
+. irf table fevd, impulse(tasa_ref tc tamn inflacion) response(tamn) noci
+
+Results from irf_struct
+
+------------------------------------------------------
+         |      (1)         (2)         (3)         (4)  
+    Step |     fevd        fevd        fevd        fevd  
+---------+--------------------------------------------
+       0 |        0           0           0           0
+       1 |  .011606     .000141     .988253           0
+       2 |  .045964     .000127     .949673     .004236
+       3 |  .082362     .000079     .914837     .002722
+       4 |  .114922     .000088     .882622     .002368
+       5 |  .142604     .000278     .853996     .003122
+       6 |   .16587     .000715     .828974     .004442
+       7 |   .18538     .001351     .807356     .005913
+       8 |  .201723     .002123     .788792     .007361
+       9 |  .215408     .002985     .772895     .008712
+      10 |  .226876     .003904     .759288     .009932
+      11 |  .236498     .004861     .747631      .01101
+      12 |  .244583     .005842     .737626     .011949
+      13 |  .251387     .006839     .729016     .012758
+      14 |  .257116     .007846     .721587     .013451
+      15 |  .261943      .00886     .715157      .01404
+      16 |  .266008      .00988     .709575     .014537
+      17 |  .269426     .010903     .704715     .014955
+      18 |  .272294      .01193     .700472     .015303
+      19 |  .274691      .01296     .696758     .015591
+      20 |  .276682     .013993     .693497     .015827
+      21 |  .278324     .015029     .690629     .016017
+      22 |  .279663     .016068     .688101     .016167
+      23 |  .280738      .01711     .685868     .016283
+      24 |  .281583     .018155     .683892      .01637
+------------------------------------------------------
+(1) irfname = irf_struct, impulse = tasa_ref, and response = tamn.
+(2) irfname = irf_struct, impulse = tc, and response = tamn.
+(3) irfname = irf_struct, impulse = tamn, and response = tamn.
+(4) irfname = irf_struct, impulse = inflacion, and response = tamn.
+
+. 
+. irf graph fevd, response(tamn) ///
+>     title("FEVD de TAMN (VAR con dummies de choques)") ///
+>     xtitle("Horizonte (meses)") scheme(s1color)
+
+. graph export "$out\g8_fevd_tamn_structural.png", replace width(1200)
+file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo
+    grupal\Regresion_VAR_Structural\output\g8_fevd_tamn_structural.png saved as PNG format
+
+. 
+. display "--- FEVD de Inflacion ---"
+--- FEVD de Inflacion ---
+
+. irf table fevd, impulse(tasa_ref tc tamn inflacion) response(inflacion) noci
+
+Results from irf_struct
+
+------------------------------------------------------
+         |      (1)         (2)         (3)         (4)  
+    Step |     fevd        fevd        fevd        fevd  
+---------+--------------------------------------------
+       0 |        0           0           0           0
+       1 |  .012558     .004954     .000012     .982475
+       2 |  .037161     .017887      .00238     .942571
+       3 |  .056975     .018706     .002336     .921983
+       4 |  .069509       .0185     .002516     .909475
+       5 |  .077801     .018317     .002607     .901276
+       6 |  .083724     .018177     .002642     .895457
+       7 |  .088126     .018064     .002659     .891152
+       8 |   .09148     .017977     .002666     .887877
+       9 |  .094098     .017916     .002668     .885319
+      10 |  .096191     .017877     .002665     .883267
+      11 |  .097901     .017856     .002661     .881582
+      12 |  .099326     .017851     .002656     .880168
+      13 |  .100532     .017858     .002651     .878958
+      14 |   .10157     .017875     .002648     .877907
+      15 |  .102475     .017899     .002645      .87698
+      16 |  .103273     .017929     .002645     .876153
+      17 |  .103984     .017963     .002648     .875406
+      18 |  .104623        .018     .002652     .874725
+      19 |  .105201     .018039      .00266     .874101
+      20 |  .105729     .018079      .00267     .873523
+      21 |  .106213     .018119     .002683     .872986
+      22 |  .106659      .01816     .002699     .872483
+      23 |  .107072       .0182     .002718      .87201
+      24 |  .107457     .018239      .00274     .871564
+------------------------------------------------------
+(1) irfname = irf_struct, impulse = tasa_ref, and response = inflacion.
+(2) irfname = irf_struct, impulse = tc, and response = inflacion.
+(3) irfname = irf_struct, impulse = tamn, and response = inflacion.
+(4) irfname = irf_struct, impulse = inflacion, and response = inflacion.
+
+. 
+. irf graph fevd, response(inflacion) ///
+>     title("FEVD de Inflacion (VAR con dummies de choques)") ///
+>     xtitle("Horizonte (meses)") scheme(s1color)
+
+. graph export "$out\g9_fevd_inf_structural.png", replace width(1200)
+file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo
+    grupal\Regresion_VAR_Structural\output\g9_fevd_inf_structural.png saved as PNG format
+
+. 
+. 
+. /* ----------------------------------------------------------
+>    8. ANALISIS POR SUBPERIODOS
+>    VAR estimado en 3 periodos:
+>      Pre-GFC     : 2004m1 - 2008m8
+>      Pre-COVID   : 2009m7 - 2020m2
+>      Post-COVID  : 2020m3 - 2025m12
+>    -> Permite ver si el mecanismo de transmision cambio
+> ---------------------------------------------------------- */
+. 
+. display _newline "=== VAR POR SUBPERIODOS ==="
+
+=== VAR POR SUBPERIODOS ===
+
+. 
+. * --- Subperiodo 1: Pre-GFC ---
+. display _newline "--- SUB-PERIODO 1: Pre-GFC (2004m1 - 2008m8) ---"
+
+--- SUB-PERIODO 1: Pre-GFC (2004m1 - 2008m8) ---
+
+. preserve
+
+. keep if mes >= tm(2004m1) & mes <= tm(2008m8)
+(208 observations deleted)
+
+. display "Obs en sub-periodo 1: " _N
+Obs en sub-periodo 1: 56
+
+. cap var tasa_ref tc tamn inflacion, lags(1/2)
+
+. if _rc == 0 {
+.     varstable
+
+   Eigenvalue stability condition
+  +----------------------------------------+
+  |        Eigenvalue        |   Modulus   |
+  |--------------------------+-------------|
+  |   1.021752               |   1.02175   |
+  |   .8383687 +  .1483578i  |   .851394   |
+  |   .8383687 -  .1483578i  |   .851394   |
+  | -.04092917 +  .4211239i  |   .423108   |
+  | -.04092917 -  .4211239i  |   .423108   |
+  |   .3908643 + .09682466i  |   .402678   |
+  |   .3908643 - .09682466i  |   .402678   |
+  | -.09812996               |    .09813   |
+  +----------------------------------------+
+   At least one eigenvalue is at least 1.0.
+   VAR does not satisfy stability condition.
+.     irf create irf_pregfc, step(18) set("$out\irf_pregfc") replace
+(file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo grupal\Regresion_VAR_Structural\output\irf_pregfc.irf 
+> now active)
+(file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo grupal\Regresion_VAR_Structural\output\irf_pregfc.irf 
+> updated)
+.     irf table oirf, impulse(tasa_ref) response(tamn) noci
+
+Results from irf_pregfc
+
+---------------------
+         |      (1)  
+    Step |     oirf  
+---------+-----------
+       0 |   .06043
+       1 |  .069712
+       2 |  .030145
+       3 | -.034705
+       4 | -.074474
+       5 | -.100176
+       6 | -.120308
+       7 | -.133851
+       8 | -.141132
+       9 | -.144001
+      10 | -.143774
+      11 |  -.14134
+      12 | -.137507
+      13 | -.132965
+      14 | -.128234
+      15 | -.123701
+      16 | -.119638
+      17 | -.116226
+      18 | -.113564
+---------------------
+(1) irfname = irf_pregfc, impulse = tasa_ref, and response = tamn.
+.     display "(IRF pre-GFC: tasa_ref -> tamn)"
+(IRF pre-GFC: tasa_ref -> tamn)
+. }
+
+. else {
+.     display "AVISO: muestra insuficiente para VAR en sub-periodo 1"
+. }
+
+. restore
+
+. 
+. * --- Subperiodo 2: Pre-COVID ---
+. display _newline "--- SUB-PERIODO 2: Pre-COVID (2009m7 - 2020m2) ---"
+
+--- SUB-PERIODO 2: Pre-COVID (2009m7 - 2020m2) ---
+
+. preserve
+
+. keep if mes >= tm(2009m7) & mes <= tm(2020m2)
+(136 observations deleted)
+
+. display "Obs en sub-periodo 2: " _N
+Obs en sub-periodo 2: 128
+
+. var tasa_ref tc tamn inflacion, lags(1/2)
+
+Vector autoregression
+
+Sample: 2009m9 thru 2020m2                      Number of obs     =        126
+Log likelihood =   377.6876                     AIC               =  -5.423612
+FPE            =   5.19e-08                     HQIC              =  -5.094386
+Det(Sigma_ml)  =   2.93e-08                     SBIC              =  -4.613246
+
+Equation           Parms      RMSE     R-sq      chi2     P>chi2
+----------------------------------------------------------------
+tasa_ref              9     .109435   0.9860   8846.916   0.0000
+tc                    9     .030865   0.9888   11166.07   0.0000
+tamn                  9     .232182   0.9852   8371.388   0.0000
+inflacion             9     .258346   0.1240   17.83587   0.0225
+----------------------------------------------------------------
+
+------------------------------------------------------------------------------
+             | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+tasa_ref     |
+    tasa_ref |
+         L1. |   1.243728   .0703948    17.67   0.000     1.105757    1.381699
+         L2. |  -.2802895   .0691602    -4.05   0.000    -.4158411   -.1447379
+             |
+          tc |
+         L1. |   .5150985   .3062806     1.68   0.093    -.0852005    1.115398
+         L2. |  -.4827419   .2984818    -1.62   0.106    -1.067755    .1022716
+             |
+        tamn |
+         L1. |  -.0172151   .0400285    -0.43   0.667    -.0956695    .0612394
+         L2. |   .0365682   .0404168     0.90   0.366    -.0426474    .1157837
+             |
+   inflacion |
+         L1. |   .0836369   .0366614     2.28   0.023     .0117819     .155492
+         L2. |    .043416   .0369224     1.18   0.240    -.0289506    .1157825
+             |
+       _cons |  -.3262141   .2812826    -1.16   0.246    -.8775179    .2250897
+-------------+----------------------------------------------------------------
+tc           |
+    tasa_ref |
+         L1. |  -.0026984   .0198542    -0.14   0.892     -.041612    .0362152
+         L2. |   .0009591    .019506     0.05   0.961     -.037272    .0391902
+             |
+          tc |
+         L1. |    1.19879   .0863838    13.88   0.000     1.029481    1.368099
+         L2. |  -.2351616   .0841842    -2.79   0.005    -.4001595   -.0701637
+             |
+        tamn |
+         L1. |  -.0020257   .0112897    -0.18   0.858    -.0241531    .0201017
+         L2. |  -.0046771   .0113992    -0.41   0.682    -.0270191     .017665
+             |
+   inflacion |
+         L1. |  -.0085506     .01034    -0.83   0.408    -.0288167    .0117155
+         L2. |   .0160817   .0104136     1.54   0.123    -.0043287     .036492
+             |
+       _cons |   .2311892   .0793333     2.91   0.004     .0756989    .3866796
+-------------+----------------------------------------------------------------
+tamn         |
+    tasa_ref |
+         L1. |   .3113947   .1493526     2.08   0.037     .0186688    .6041205
+         L2. |  -.2851601   .1467334    -1.94   0.052    -.5727522     .002432
+             |
+          tc |
+         L1. |    -.22084   .6498183    -0.34   0.734     -1.49446     1.05278
+         L2. |    .208534   .6332719     0.33   0.742    -1.032656    1.449724
+             |
+        tamn |
+         L1. |    1.23225   .0849263    14.51   0.000     1.065798    1.398702
+         L2. |  -.2502088   .0857501    -2.92   0.004     -.418276   -.0821417
+             |
+   inflacion |
+         L1. |   .0199443   .0777824     0.26   0.798    -.1325064    .1723951
+         L2. |  -.0983463   .0783362    -1.26   0.209    -.2518823    .0551898
+             |
+       _cons |   .2353644   .5967814     0.39   0.693    -.9343057    1.405034
+-------------+----------------------------------------------------------------
+inflacion    |
+    tasa_ref |
+         L1. |   .2546426   .1661833     1.53   0.125    -.0710708     .580356
+         L2. |  -.2183116   .1632689    -1.34   0.181    -.5383128    .1016895
+             |
+          tc |
+         L1. |    .619879   .7230469     0.86   0.391    -.7972669    2.037025
+         L2. |  -.6445939   .7046359    -0.91   0.360    -2.025655    .7364671
+             |
+        tamn |
+         L1. |   .0536807   .0944967     0.57   0.570    -.1315295    .2388908
+         L2. |  -.0464805   .0954134    -0.49   0.626    -.2334873    .1405263
+             |
+   inflacion |
+         L1. |   .1891949   .0865478     2.19   0.029     .0195643    .3588255
+         L2. |  -.2466649   .0871639    -2.83   0.005    -.4175031   -.0758267
+             |
+       _cons |   .0692338   .6640333     0.10   0.917    -1.232248    1.370715
+------------------------------------------------------------------------------
+
+. varstable
+
+   Eigenvalue stability condition
+  +----------------------------------------+
+  |        Eigenvalue        |   Modulus   |
+  |--------------------------+-------------|
+  |   .9932132               |   .993213   |
+  |   .9517901               |    .95179   |
+  |   .9436797               |    .94368   |
+  |  .06536712 +  .4954071i  |   .499701   |
+  |  .06536712 -  .4954071i  |   .499701   |
+  |     .40439               |    .40439   |
+  |   .2200777 +  .1138573i  |   .247786   |
+  |   .2200777 -  .1138573i  |   .247786   |
+  +----------------------------------------+
+   All the eigenvalues lie inside the unit circle.
+   VAR satisfies stability condition.
+
+. irf create irf_precovid, step(18) set("$out\irf_precovid") replace
+(file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo grupal\Regresion_VAR_Structural\output\irf_precovid.ir
+> f now active)
+(file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo grupal\Regresion_VAR_Structural\output\irf_precovid.ir
+> f updated)
+
+. irf table oirf, impulse(tasa_ref) response(tamn) noci
+
+Results from irf_precovid
+
+---------------------
+         |      (1)  
+    Step |     oirf  
+---------+-----------
+       0 |  .008061
+       1 |  .043966
+       2 |  .060922
+       3 |  .066498
+       4 |  .069197
+       5 |  .071129
+       6 |  .072334
+       7 |  .073091
+       8 |  .073724
+       9 |  .074316
+      10 |  .074838
+      11 |  .075283
+      12 |  .075667
+      13 |  .076001
+      14 |  .076285
+      15 |  .076522
+      16 |  .076715
+      17 |  .076866
+      18 |  .076979
+---------------------
+(1) irfname = irf_precovid, impulse = tasa_ref, and response = tamn.
+
+. display "(IRF pre-COVID: tasa_ref -> tamn)"
+(IRF pre-COVID: tasa_ref -> tamn)
+
+. restore
+
+. 
+. * --- Subperiodo 3: Post-COVID ---
+. display _newline "--- SUB-PERIODO 3: Post-COVID (2020m3 - 2025m12) ---"
+
+--- SUB-PERIODO 3: Post-COVID (2020m3 - 2025m12) ---
+
+. preserve
+
+. keep if mes >= tm(2020m3)
+(194 observations deleted)
+
+. display "Obs en sub-periodo 3: " _N
+Obs en sub-periodo 3: 70
+
+. cap var tasa_ref tc tamn inflacion, lags(1/2)
+
+. if _rc == 0 {
+.     varstable
+
+   Eigenvalue stability condition
+  +----------------------------------------+
+  |        Eigenvalue        |   Modulus   |
+  |--------------------------+-------------|
+  |    1.11951 + .09395464i  |   1.12345   |
+  |    1.11951 - .09395464i  |   1.12345   |
+  |   .4055448 +  .5785348i  |   .706519   |
+  |   .4055448 -  .5785348i  |   .706519   |
+  |  -.5239692 + .04229142i  |   .525673   |
+  |  -.5239692 - .04229142i  |   .525673   |
+  |   .3863692               |   .386369   |
+  |  .00722971               |    .00723   |
+  +----------------------------------------+
+   At least one eigenvalue is at least 1.0.
+   VAR does not satisfy stability condition.
+.     irf create irf_postcovid, step(18) set("$out\irf_postcovid") replace
+(file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo grupal\Regresion_VAR_Structural\output\irf_postcovid.i
+> rf now active)
+(file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo grupal\Regresion_VAR_Structural\output\irf_postcovid.i
+> rf updated)
+.     irf table oirf, impulse(tasa_ref) response(tamn) noci
+
+Results from irf_postcovid
+
+---------------------
+         |      (1)  
+    Step |     oirf  
+---------+-----------
+       0 |  .030384
+       1 |  .057094
+       2 |  .091933
+       3 |  .095485
+       4 |  .127718
+       5 |  .150077
+       6 |  .189568
+       7 |  .225854
+       8 |  .269832
+       9 |  .315198
+      10 |   .36701
+      11 |  .423426
+      12 |  .485789
+      13 |  .552999
+      14 |  .625075
+      15 |  .701357
+      16 |  .781438
+      17 |   .86446
+      18 |  .949333
+---------------------
+(1) irfname = irf_postcovid, impulse = tasa_ref, and response = tamn.
+.     display "(IRF post-COVID: tasa_ref -> tamn)"
+(IRF post-COVID: tasa_ref -> tamn)
+. }
+
+. else {
+.     display "AVISO: muestra insuficiente o error en sub-periodo 3"
+. }
+
+. restore
+
+. 
+. 
+. /* ----------------------------------------------------------
+>    9. GRAFICO COMPARATIVO IRF: BASELINE vs ESTRUCTURAL
+>    Usando irf set para superponer ambas IRFs
+> ---------------------------------------------------------- */
+. 
+. display _newline "=== COMPARACION IRF: BASELINE vs CON DUMMIES ==="
+
+=== COMPARACION IRF: BASELINE vs CON DUMMIES ===
+
+. 
+. * Restaurar IRF del VAR con dummies y comparar con baseline
+. irf set "$out\irf_structural"
+(file C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo grupal\Regresion_VAR_Structural\output\irf_structural.
+> irf now active)
+
+. irf table oirf, impulse(tasa_ref) response(tamn) noci
+
+Results from irf_struct
+
+---------------------
+         |      (1)  
+    Step |     oirf  
+---------+-----------
+       0 |  .030684
+       1 |  .088687
+       2 |  .129494
+       3 |  .155592
+       4 |  .173506
+       5 |  .186578
+       6 |  .196143
+       7 |  .202986
+       8 |  .207733
+       9 |   .21088
+      10 |  .212802
+      11 |  .213787
+      12 |  .214051
+      13 |  .213761
+      14 |  .213042
+      15 |  .211993
+      16 |  .210687
+      17 |  .209181
+      18 |  .207519
+      19 |  .205734
+      20 |  .203854
+      21 |  .201899
+      22 |  .199884
+      23 |  .197822
+      24 |  .195723
+---------------------
+(1) irfname = irf_struct, impulse = tasa_ref, and response = tamn.
+
+. 
+. display _newline "Tabla comparativa (baseline vs estructural):"
+
+Tabla comparativa (baseline vs estructural):
+
+. display "Baseline  (sin dummies): ver irf_base"
+Baseline  (sin dummies): ver irf_base
+
+. display "Estructural (con GFC+COVID+highinfl dummies): ver irf_structural"
+Estructural (con GFC+COVID+highinfl dummies): ver irf_structural
+
+. 
+. 
+. /* ----------------------------------------------------------
+>    10. RESUMEN DE RESULTADOS
+> ---------------------------------------------------------- */
+. 
+. display _newline _newline
+
+
+
+
+. display "======================================================"
+======================================================
+
+. display "  VAR CON CHOQUES ESTRUCTURALES - RESULTADOS CLAVE"
+  VAR CON CHOQUES ESTRUCTURALES - RESULTADOS CLAVE
+
+. display "======================================================"
+======================================================
+
+. display "  Shocks modelados:"
+  Shocks modelados:
+
+. display "    D_gfc      : Crisis Financiera Global  sep-2008/jun-2009"
+    D_gfc      : Crisis Financiera Global  sep-2008/jun-2009
+
+. display "    D_pandemic : COVID-19                  mar-2020/dic-2021"
+    D_pandemic : COVID-19                  mar-2020/dic-2021
+
+. display "    D_highinfl : Alta inflacion post-COVID  ene-2022/dic-2023"
+    D_highinfl : Alta inflacion post-COVID  ene-2022/dic-2023
+
+. display ""
+
+
+. display "  QUE LEER:"
+  QUE LEER:
+
+. display "  [1] Chow tests  -> coef. de interaccion  (cambio en pass-through)"
+  [1] Chow tests  -> coef. de interaccion  (cambio en pass-through)
+
+. display "  [2] Estabilidad -> eigenvalues < 1"
+  [2] Estabilidad -> eigenvalues < 1
+
+. display "  [3] LM test     -> p > 0.05 = sin autocorrelacion"
+  [3] LM test     -> p > 0.05 = sin autocorrelacion
+
+. display "  [4] Granger     -> tasa_ref->tamn y tasa_ref->inflacion"
+  [4] Granger     -> tasa_ref->tamn y tasa_ref->inflacion
+
+. display "  [5] IRF (mes 7) -> pico de respuesta de TAMN (baseline vs estructural)"
+  [5] IRF (mes 7) -> pico de respuesta de TAMN (baseline vs estructural)
+
+. display "  [6] FEVD (mes12)-> % varianza TAMN explicado por tasa_ref"
+  [6] FEVD (mes12)-> % varianza TAMN explicado por tasa_ref
+
+. display "  [7] Subperiodos -> cambio en IRF antes/despues de cada crisis"
+  [7] Subperiodos -> cambio en IRF antes/despues de cada crisis
+
+. display ""
+
+
+. display "  Archivos en: $out"
+  Archivos en: C:\Users\51950\Documents\ULIMA\2026_1\Teo. Politica\Trabajo grupal\Regresion_VAR_Structural\output
+
+. display "======================================================"
+======================================================
+
+. 
+end of do-file
